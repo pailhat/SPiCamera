@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="8"
+    tools:context="com.example.student.spicamera.MainActivity">
+
+
+
+<WebView
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:id="@+id/webView"
+    android:layout_alignParentTop="true"
+    android:layout_margin="5dp"
+    android:layout_weight="5" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:weightSum="4">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:id="@+id/buttonLeft"
+                android:text="Left" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:id="@+id/buttonSnapShot"
+                android:text="Snapshot" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:id="@+id/buttonRight"
+                android:text="Right" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
