@@ -8,6 +8,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -24,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
 
     private WebView wv1;
+
+    private EditText urlText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,11 +57,24 @@ public class MainActivity extends AppCompatActivity {
         wv1.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
         wv1.loadUrl(url);
 
+        urlText = (EditText) findViewById(R.id.url_text);
+
         Button button = (Button) findViewById(R.id.sign_out_button_cam);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Do something in response to button click
                 signOut();
+            }
+        });
+
+        Button urlButton = (Button) findViewById(R.id.load_url_button);
+        urlButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Do something in response to button click
+                //Get the text from edit text and save it into input
+                String input = urlText.getText().toString();
+
+                wv1.loadUrl(input);
             }
         });
 
@@ -83,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, GoogleSignInActivity.class);
         startActivity(intent);
     }
+
 
     private class MyBrowser extends WebViewClient {
         @Override
