@@ -41,6 +41,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Demonstrate Firebase Authentication using a Google ID Token.
@@ -204,6 +208,7 @@ public class GoogleSignInActivity extends BaseActivity implements
 
             final String userId = user.getUid();
             final String userEmail = user.getEmail();
+            final String deviceToken = FirebaseInstanceId.getInstance().getToken();
 
             myRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -211,10 +216,17 @@ public class GoogleSignInActivity extends BaseActivity implements
                     if (snapshot.exists()) {
                         //user exists, do something
                         Log.w(TAG, "USER EXISTS: " + userId);
+                        Log.w(TAG, "DEVICEID: " + deviceToken);
+
+                        Map<String, Object> updates = new HashMap<>();
+                        updates.put("deviceID", deviceToken);
+
+                        myRef.child(userId).updateChildren(updates);
                     } else {
                         //user does not exist, do something else
                         Log.w(TAG, "USER DOES NOT EXIST: " + userId);
-                        myRef.child(userId).setValue(new User(userId,"",userEmail,""));
+                        Log.w(TAG, "DEVICEID: " + deviceToken);
+                        myRef.child(userId).setValue(new User(userId,deviceToken,userEmail,""));
                     }
                 }
                 @Override
