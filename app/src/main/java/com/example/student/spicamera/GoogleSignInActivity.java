@@ -36,8 +36,12 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 /**
  * Demonstrate Firebase Authentication using a Google ID Token.
  */
@@ -195,11 +199,30 @@ public class GoogleSignInActivity extends BaseActivity implements
 
             //OPEN MAIN ACTIVITY
             FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference myRef = database.getReference("users");
 
-            //myRef.setValue(user.getUid());
+            final DatabaseReference myRef = database.getReference("users");
 
-            myRef.child(user.getUid()).setValue(new User(user.getUid(),"",user.getEmail(),""));
+            final String userId = user.getUid();
+            final String userEmail = user.getEmail();
+
+            myRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        //user exists, do something
+                        Log.w(TAG, "USER EXISTS: " + userId);
+                    } else {
+                        //user does not exist, do something else
+                        Log.w(TAG, "USER DOES NOT EXIST: " + userId);
+                        myRef.child(userId).setValue(new User(userId,"",userEmail,""));
+                    }
+                }
+                @Override
+                public void onCancelled(DatabaseError arg0) {
+                }
+            });
+
+
 
             Log.w(TAG, user.getUid());
 
