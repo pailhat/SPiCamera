@@ -194,11 +194,14 @@ public class GoogleSignInActivity extends BaseActivity implements
             findViewById(R.id.sign_out_and_disconnect).setVisibility(View.VISIBLE);
 
             //OPEN MAIN ACTIVITY
-            //FirebaseDatabase database = FirebaseDatabase.getInstance();
-            //DatabaseReference myRef = database.getReference("users");
-            
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference myRef = database.getReference("users");
 
             //myRef.setValue(user.getUid());
+
+            myRef.child(user.getUid()).setValue(new User(user.getUid(),"",user.getEmail(),""));
+
+            Log.w(TAG, user.getUid());
 
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);

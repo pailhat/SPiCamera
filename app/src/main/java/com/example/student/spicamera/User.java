@@ -7,11 +7,13 @@ package com.example.student.spicamera;
 public class User {
     public String deviceID;
     public String userID;
+    public String email;
     public String registeredCameras;
 
-    public User(String userID,String deviceID,String registeredCameras){
+    public User(String userID,String deviceID,String email,String registeredCameras){
         this.deviceID = deviceID;
         this.userID = userID;
+        this.email = email;
         this.registeredCameras = registeredCameras;
     }
 
@@ -21,6 +23,9 @@ public class User {
 
     public String getDeviceID(){
         return this.deviceID;
+    }
+    public String getEmail(){
+        return this.email;
     }
     public String getUserID(){
         return this.userID;
