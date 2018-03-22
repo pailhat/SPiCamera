@@ -8,13 +8,20 @@ public class User {
     public String deviceID;
     public String userID;
     public String email;
-    public String registeredCameras;
+    public String camera1;
+    public String camera2;
+    public String camera3;
+    public String camera4;
 
-    public User(String userID,String deviceID,String email,String registeredCameras){
+
+    public User(String userID,String deviceID,String email){
         this.deviceID = deviceID;
         this.userID = userID;
         this.email = email;
-        this.registeredCameras = registeredCameras;
+        this.camera1 = "";
+        this.camera2 = "";
+        this.camera3 = "";
+        this.camera4 = "";
     }
 
     public void setUserID(String userID){
@@ -30,8 +37,17 @@ public class User {
     public String getUserID(){
         return this.userID;
     }
-    public String getRegisteredCameras(){
-        return this.registeredCameras;
+    public String getCamera1(){
+        return this.camera1;
+    }
+    public String getCamera2(){
+        return this.camera2;
+    }
+    public String getCamera3(){
+        return this.camera3;
+    }
+    public String getCamera4(){
+        return this.camera4;
     }
 
 }

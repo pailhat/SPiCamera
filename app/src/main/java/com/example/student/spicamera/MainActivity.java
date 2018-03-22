@@ -67,8 +67,10 @@ public class MainActivity extends AppCompatActivity {
 
         wv1=(WebView)findViewById(R.id.webView);
         wv1.setWebViewClient(new MyBrowser());
+
         //IP Adress of the rPi
-        String url = "http://spicam:jasper123@149.61.173.138:8082/";
+        String url = (String) getIntent().getExtras().get("IP");
+
         wv1.setInitialScale(1);
         wv1.getSettings().setLoadsImagesAutomatically(true);
         wv1.getSettings().setLoadWithOverviewMode(true);
@@ -81,6 +83,9 @@ public class MainActivity extends AppCompatActivity {
 
         urlText = (EditText) findViewById(R.id.url_text);
 
+
+
+        urlText.setText(url);
 
         Button urlButton = (Button) findViewById(R.id.load_url_button);
         urlButton.setOnClickListener(new View.OnClickListener() {

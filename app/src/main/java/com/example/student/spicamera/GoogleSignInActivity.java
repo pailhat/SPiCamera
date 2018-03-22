@@ -218,7 +218,7 @@ public class GoogleSignInActivity extends BaseActivity implements
                         //user does not exist, do something else
                         Log.w(TAG, "USER DOES NOT EXIST: " + userId);
                         Log.w(TAG, "DEVICEID: " + deviceToken);
-                        myRef.child(userId).setValue(new User(userId,deviceToken,userEmail,""));
+                        myRef.child(userId).setValue(new User(userId,deviceToken,userEmail));
                     }
                 }
                 @Override

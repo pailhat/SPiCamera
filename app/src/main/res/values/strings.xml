@@ -22,4 +22,6 @@
     <string name="title_activity_register">Register a New Camera</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="register_hint">Enter your camera\'s ID</string>
+    <string name="register_text">Select which camera you want to register</string>
 </resources>

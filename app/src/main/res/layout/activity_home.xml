@@ -55,7 +55,7 @@ tools:context="com.example.student.spicamera.MainActivity">
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
             android:id="@+id/cv_2"
-            app:cardBackgroundColor="@color/cardBackground"
+            app:cardBackgroundColor="@color/cardBackgroundInactive"
             >
 
             <RelativeLayout
@@ -92,7 +92,7 @@ tools:context="com.example.student.spicamera.MainActivity">
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
             android:id="@+id/cv_3"
-            app:cardBackgroundColor="@color/cardBackground"
+            app:cardBackgroundColor="@color/cardBackgroundInactive"
             >
 
             <RelativeLayout
@@ -129,7 +129,7 @@ tools:context="com.example.student.spicamera.MainActivity">
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
             android:id="@+id/cv_4"
-            app:cardBackgroundColor="@color/cardBackground"
+            app:cardBackgroundColor="@color/cardBackgroundInactive"
             >
 
             <RelativeLayout

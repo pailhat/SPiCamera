@@ -61,7 +61,7 @@
             android:layout_gravity="center"
             android:layout_weight="2"
             android:textColor="#ffffff"
-            android:text="http://spicam:jasper123@149.61.173.138:8082/" />
+            android:text="" />
         <Button
             android:id="@+id/load_url_button"
             android:layout_width="wrap_content"

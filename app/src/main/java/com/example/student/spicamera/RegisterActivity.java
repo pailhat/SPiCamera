@@ -8,7 +8,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -16,6 +20,16 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -24,8 +38,9 @@ public class RegisterActivity extends AppCompatActivity {
     // [END declare_auth]
 
     private GoogleSignInClient mGoogleSignInClient;
-
+    private FirebaseUser user;
     private TextView mTextMessage;
+    private RadioGroup radioGroup;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -58,14 +73,83 @@ public class RegisterActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        user = mAuth.getCurrentUser();
+
         //[END GOOGLE]
 
-        //mTextMessage = (TextView) findViewById(R.id.message);
+        mTextMessage = (TextView) findViewById(R.id.cameraId);
+
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.getMenu().getItem(1).setChecked(true);
         Log.w("BottomNav", navigation.getSelectedItemId() + "");
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
+
+        Button submitButton = (Button) findViewById(R.id.submit_register);
+        submitButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Do something in response to button click
+                //Get the text from edit text and save it into input
+                registerCamera();
+
+            }
+        });
+
+
+    }
+
+    private void registerCamera() {
+        int radioButtonID = radioGroup.getCheckedRadioButtonId();
+        View radioButton = radioGroup.findViewById(radioButtonID);
+        final int idx = radioGroup.indexOfChild(radioButton) + 1;
+
+        final String cameraID = mTextMessage.getText().toString();
+
+        if (cameraID.equals("")) {
+            makeToast("Please enter a camera ID first.");
+        } else {
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            final DatabaseReference myRefCamera = database.getReference("cameras");
+            final DatabaseReference myRefUser = database.getReference("users");
+
+            final String userId = user.getUid();
+
+            myRefCamera.child(cameraID).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        //Update the registeredTo field of the cameraID specified
+                        Map<String, Object> updatesCamera = new HashMap<>();
+                        updatesCamera.put("registeredTo", userId);
+
+                        myRefCamera.child(cameraID).updateChildren(updatesCamera);
+
+                        //Update the user object and put the camera in
+                        Map<String, Object> updatesUser = new HashMap<>();
+                        updatesUser.put("camera" + idx, cameraID);
+
+                        myRefUser.child(userId).updateChildren(updatesUser);
+
+                        makeToast("Registered camera " + idx + " with ID: " + cameraID);
+                    } else {
+                        makeToast("CAMERA DOES NOT EXIST");
+                    }
+                }
+                @Override
+                public void onCancelled(DatabaseError arg0) {
+                }
+            });
+
+
+
+        }
+    }
+
+    private void makeToast(String text) {
+        Toast toast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+        toast.show();
     }
 
     private void goHome() {

@@ -65,13 +65,17 @@ public class HomeActivity extends AppCompatActivity {
         CardView cv = (CardView) findViewById(R.id.cv_1);
         cv.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                goToCamera();
+                goToCamera("dummyCameraID","http://spicam:jasper123@149.61.173.138:8082/");
             }
         });
     }
 
-    private void goToCamera() {
+    private void goToCamera(String cameraID, String IP) {
         Intent intent = new Intent(this, MainActivity.class);
+
+        intent.putExtra("CAMERA_ID", cameraID);
+        intent.putExtra("IP", IP);
+
         startActivity(intent);
     }
 

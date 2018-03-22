@@ -5,4 +5,5 @@
     <color name="colorAccent">#5e8f48</color>
     <color name="windowBackGround">#4b4b4b</color>
     <color name="cardBackground">#b99191</color>
+    <color name="cardBackgroundInactive">#787373</color>
 </resources>

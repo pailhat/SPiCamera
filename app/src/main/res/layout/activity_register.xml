@@ -9,12 +9,82 @@
 
     <LinearLayout
         android:orientation="vertical"
-
+        android:layout_gravity="center"
         android:layout_width="match_parent"
-        android:layout_margin="4dp"
         android:layout_height="0dp"
         android:layout_weight="7"
-        android:weightSum="8">
+        android:weightSum="5">
+
+        <ImageView
+            android:id="@+id/google_icon"
+            android:layout_height="0dp"
+            android:layout_width="wrap_content"
+            android:layout_weight="2"
+            android:src="@drawable/spicam_logo" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="@string/register_text"
+            android:gravity="center"
+            android:layout_gravity="center"/>
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp">
+
+            <RadioButton
+                android:id="@+id/radio1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:text="Camera 1"
+                android:checked="true" />
+
+            <RadioButton
+                android:id="@+id/radio2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:text="Camera 2" />
+
+            <RadioButton
+                android:id="@+id/radio3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:text="Camera 3" />
+
+            <RadioButton
+                android:id="@+id/radio4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:text="Camera 4" />
+
+        </RadioGroup>
+
+
+
+        <EditText
+            android:id="@+id/cameraId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_marginBottom="25dp"
+            android:textColor="#ffffff"
+            android:hint="@string/register_hint"
+            android:text="" />
+
+        <Button
+            android:id="@+id/submit_register"
+            android:layout_width="200dp"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:text="Register" />
 
     </LinearLayout>
 
