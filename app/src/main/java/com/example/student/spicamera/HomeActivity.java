@@ -5,12 +5,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.TextView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -19,16 +17,13 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class MainActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity {
     // [START declare_auth]
     private FirebaseAuth mAuth;
     // [END declare_auth]
 
     private GoogleSignInClient mGoogleSignInClient;
-
-    private WebView wv1;
-
-    private EditText urlText;
+    private TextView mTextMessage;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -37,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    goHome();
                     return true;
                 case R.id.navigation_register:
                     goToRegisterPage();
@@ -53,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_home);
 
         //[GOOGLE SIGN IN OBJECTS NEEDED TO LOGOUT]
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -65,44 +59,22 @@ public class MainActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         //[END GOOGLE]
 
-        wv1=(WebView)findViewById(R.id.webView);
-        wv1.setWebViewClient(new MyBrowser());
-        //IP Adress of the rPi
-        String url = "http://spicam:jasper123@149.61.173.138:8082/";
-        wv1.setInitialScale(1);
-        wv1.getSettings().setLoadsImagesAutomatically(true);
-        wv1.getSettings().setLoadWithOverviewMode(true);
-        wv1.getSettings().setUseWideViewPort(true);
-        wv1.getSettings().setJavaScriptEnabled(true);
-        wv1.getSettings().setBuiltInZoomControls(true);
-        wv1.getSettings().setDisplayZoomControls(false);
-        wv1.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
-        wv1.loadUrl(url);
-
-        urlText = (EditText) findViewById(R.id.url_text);
-
-
-        Button urlButton = (Button) findViewById(R.id.load_url_button);
-        urlButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Do something in response to button click
-                //Get the text from edit text and save it into input
-                String input = urlText.getText().toString();
-
-                wv1.loadUrl(input);
-            }
-        });
-
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
+        CardView cv = (CardView) findViewById(R.id.cv_1);
+        cv.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                goToCamera();
+            }
+        });
     }
 
-
-    private void goHome() {
-        Intent intent = new Intent(this, HomeActivity.class);
+    private void goToCamera() {
+        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
+
 
     private void signOut() {
         // Firebase sign out
@@ -119,21 +91,14 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    private void goToSignInPage() {
-        Intent intent = new Intent(this, GoogleSignInActivity.class);
-        startActivity(intent);
-    }
-
     private void goToRegisterPage() {
         Intent intent = new Intent(this, RegisterActivity.class);
         startActivity(intent);
     }
 
-    private class MyBrowser extends WebViewClient {
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            view.loadUrl(url);
-            return true;
-        }
+    private void goToSignInPage() {
+        Intent intent = new Intent(this, GoogleSignInActivity.class);
+        startActivity(intent);
     }
+
 }
