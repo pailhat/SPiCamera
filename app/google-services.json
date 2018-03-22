@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "381297433071",
+    "firebase_url": "https://spi-camera.firebaseio.com",
+    "project_id": "spi-camera",
+    "storage_bucket": "spi-camera.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:381297433071:android:9b7ad0a609b15507",
+        "android_client_info": {
+          "package_name": "com.example.student.spicamera"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "381297433071-j2kidp1l7a0lvf8a68b1k7podjcvgk3h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.student.spicamera",
+            "certificate_hash": "26cb49899ebab9b9bd8a812ecafc859c3b4081d7"
+          }
+        },
+        {
+          "client_id": "381297433071-5bt0l4u4v4jbd4ac0ofpjhufjqh0orqe.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBErnqpToNQM_3D_ZoPk7X0QD1cPzBl3OU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "381297433071-5bt0l4u4v4jbd4ac0ofpjhufjqh0orqe.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
