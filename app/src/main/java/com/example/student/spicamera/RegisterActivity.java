@@ -97,6 +97,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
+        
         Button deleteButton = (Button) findViewById(R.id.submit_delete);
         deleteButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
