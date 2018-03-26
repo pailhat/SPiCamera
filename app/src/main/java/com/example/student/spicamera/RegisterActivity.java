@@ -137,7 +137,7 @@ public class RegisterActivity extends AppCompatActivity {
                                 public void onDataChange(DataSnapshot snapshot) {
                                     //Get user as object
                                     User userRetrieved = snapshot.getValue(User.class);
-
+                                    //Check each camera we have
                                 }
                                 @Override
                                 public void onCancelled(DatabaseError arg0) {
