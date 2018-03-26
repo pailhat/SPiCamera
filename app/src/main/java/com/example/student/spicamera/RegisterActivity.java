@@ -136,8 +136,28 @@ public class RegisterActivity extends AppCompatActivity {
                                 @Override
                                 public void onDataChange(DataSnapshot snapshot) {
                                     //Get user as object
-                                    User userRetrieved = snapshot.getValue(User.class);
+                                    User userRet = snapshot.getValue(User.class);
                                     //Check each camera we have
+                                    int idToDelete = 0;
+
+                                    if (cameraID.equals(userRet.getCamera1())) {
+                                        idToDelete = 1;
+                                    } else if (cameraID.equals(userRet.getCamera2())) {
+                                        idToDelete = 2;
+                                    } else if (cameraID.equals(userRet.getCamera3())) {
+                                        idToDelete = 3;
+                                    } else if (cameraID.equals(userRet.getCamera4())) {
+                                        idToDelete = 4;
+                                    }
+
+                                    if (idToDelete > 0) {
+                                        //Delete the camera where we have it already in the user's object
+                                        Map<String, Object> updatesUser = new HashMap<>();
+                                        updatesUser.put("camera" + idToDelete, "");
+
+                                        myRefUser.child(userId).updateChildren(updatesUser);
+                                    }
+
                                 }
                                 @Override
                                 public void onCancelled(DatabaseError arg0) {
