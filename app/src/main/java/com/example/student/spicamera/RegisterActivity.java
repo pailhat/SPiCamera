@@ -97,7 +97,15 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
+        Button deleteButton = (Button) findViewById(R.id.submit_delete);
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Do something in response to button click
+                //Get the text from edit text and save it into input
+                deleteCamera();
 
+            }
+        });
     }
 
     private void registerCamera() {
@@ -146,6 +154,54 @@ public class RegisterActivity extends AppCompatActivity {
 
         }
     }
+
+    private void deleteCamera() {
+        int radioButtonID = radioGroup.getCheckedRadioButtonId();
+        View radioButton = radioGroup.findViewById(radioButtonID);
+        final int idx = radioGroup.indexOfChild(radioButton) + 1;
+
+        final String cameraID = mTextMessage.getText().toString();
+
+        if (cameraID.equals("")) {
+            makeToast("Please enter a camera ID first.");
+        } else {
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            final DatabaseReference myRefCamera = database.getReference("cameras");
+            final DatabaseReference myRefUser = database.getReference("users");
+
+            final String userId = user.getUid();
+
+            myRefCamera.child(cameraID).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        //Update the registeredTo field of the cameraID specified
+                        Map<String, Object> updatesCamera = new HashMap<>();
+                        updatesCamera.put("registeredTo", "None");
+
+                        myRefCamera.child(cameraID).updateChildren(updatesCamera);
+
+                        //Update the user object and put the camera in
+                        Map<String, Object> updatesUser = new HashMap<>();
+                        updatesUser.put("camera" + idx, "");
+
+                        myRefUser.child(userId).updateChildren(updatesUser);
+
+                        makeToast("Deleted camera " + idx + " with ID: " + cameraID);
+                    } else {
+                        makeToast("CAMERA DOES NOT EXIST");
+                    }
+                }
+                @Override
+                public void onCancelled(DatabaseError arg0) {
+                }
+            });
+
+
+
+        }
+    }
+
 
     private void makeToast(String text) {
         Toast toast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
