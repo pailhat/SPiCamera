@@ -131,7 +131,9 @@ public class RegisterActivity extends AppCompatActivity {
                         Camera camRetrieved = snapshot.getValue(Camera.class);
 
                         if (camRetrieved.getRegisteredTo().equals(userId)) {
+
                             //Check if the camera is registered to the user already
+                            //delete that spot if it is
                             myRefUser.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot snapshot) {
@@ -157,14 +159,13 @@ public class RegisterActivity extends AppCompatActivity {
 
                                         myRefUser.child(userId).updateChildren(updatesUser);
                                     }
-
                                 }
                                 @Override
                                 public void onCancelled(DatabaseError arg0) {
                                 }
                             });
 
-
+                            //Register the camera--------
                             //Update the registeredTo field of the cameraID specified
                             Map<String, Object> updatesCamera = new HashMap<>();
                             updatesCamera.put("registeredTo", userId);
