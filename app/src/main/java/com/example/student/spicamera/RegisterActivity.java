@@ -128,19 +128,41 @@ public class RegisterActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
                     if (snapshot.exists()) {
-                        //Update the registeredTo field of the cameraID specified
-                        Map<String, Object> updatesCamera = new HashMap<>();
-                        updatesCamera.put("registeredTo", userId);
+                        Camera camRetrieved = snapshot.getValue(Camera.class);
 
-                        myRefCamera.child(cameraID).updateChildren(updatesCamera);
+                        if (camRetrieved.getRegisteredTo().equals(userId)) {
+                            //Check if the camera is registered to the user already
+                            myRefUser.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot snapshot) {
+                                    //Get user as object
+                                    User userRetrieved = snapshot.getValue(User.class);
 
-                        //Update the user object and put the camera in
-                        Map<String, Object> updatesUser = new HashMap<>();
-                        updatesUser.put("camera" + idx, cameraID);
+                                }
+                                @Override
+                                public void onCancelled(DatabaseError arg0) {
+                                }
+                            });
 
-                        myRefUser.child(userId).updateChildren(updatesUser);
 
-                        makeToast("Registered camera " + idx + " with ID: " + cameraID);
+                            //Update the registeredTo field of the cameraID specified
+                            Map<String, Object> updatesCamera = new HashMap<>();
+                            updatesCamera.put("registeredTo", userId);
+
+                            myRefCamera.child(cameraID).updateChildren(updatesCamera);
+
+                            //Update the user object and put the camera in
+                            Map<String, Object> updatesUser = new HashMap<>();
+                            updatesUser.put("camera" + idx, cameraID);
+
+                            myRefUser.child(userId).updateChildren(updatesUser);
+
+                            makeToast("Registered camera " + idx + " with ID: " + cameraID);
+
+                        } else {
+                            makeToast("That camera is not registered to your account.");
+                        }
+
                     } else {
                         makeToast("CAMERA DOES NOT EXIST");
                     }
@@ -158,48 +180,56 @@ public class RegisterActivity extends AppCompatActivity {
     private void deleteCamera() {
         int radioButtonID = radioGroup.getCheckedRadioButtonId();
         View radioButton = radioGroup.findViewById(radioButtonID);
+
         final int idx = radioGroup.indexOfChild(radioButton) + 1;
 
-        final String cameraID = mTextMessage.getText().toString();
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final DatabaseReference myRefCamera = database.getReference("cameras");
+        final DatabaseReference myRefUser = database.getReference("users");
 
-        if (cameraID.equals("")) {
-            makeToast("Please enter a camera ID first.");
-        } else {
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-            final DatabaseReference myRefCamera = database.getReference("cameras");
-            final DatabaseReference myRefUser = database.getReference("users");
+        final String userId = user.getUid();
 
-            final String userId = user.getUid();
+        //Get the user's object from the database
+        myRefUser.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                User userRetrieved = snapshot.getValue(User.class);
+                String cameraID = "";
 
-            myRefCamera.child(cameraID).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    if (snapshot.exists()) {
-                        //Update the registeredTo field of the cameraID specified
-                        Map<String, Object> updatesCamera = new HashMap<>();
-                        updatesCamera.put("registeredTo", "None");
+                //makeToast(userRetrieved.getEmail());
 
-                        myRefCamera.child(cameraID).updateChildren(updatesCamera);
-
-                        //Update the user object and put the camera in
-                        Map<String, Object> updatesUser = new HashMap<>();
-                        updatesUser.put("camera" + idx, "");
-
-                        myRefUser.child(userId).updateChildren(updatesUser);
-
-                        makeToast("Deleted camera " + idx + " with ID: " + cameraID);
-                    } else {
-                        makeToast("CAMERA DOES NOT EXIST");
-                    }
+                //Get the camera id from what the user selectec with the rdio button list
+                switch (idx) {
+                    case 1: cameraID  = userRetrieved.getCamera1(); break;
+                    case 2: cameraID  = userRetrieved.getCamera2(); break;
+                    case 3: cameraID  = userRetrieved.getCamera3(); break;
+                    case 4: cameraID  = userRetrieved.getCamera4(); break;
                 }
-                @Override
-                public void onCancelled(DatabaseError arg0) {
+
+                if (cameraID.equals("")) {
+                    makeToast("There is no camera registered under camera " + idx + ".");
+                } else {
+                    //Update the registeredTo field of the cameraID specified to None
+                    Map<String, Object> updatesCamera = new HashMap<>();
+                    updatesCamera.put("registeredTo", "None");
+
+                    myRefCamera.child(cameraID).updateChildren(updatesCamera);
+
+                    //Update the user object and put the camera in
+                    Map<String, Object> updatesUser = new HashMap<>();
+                    updatesUser.put("camera" + idx, "");
+
+                    myRefUser.child(userId).updateChildren(updatesUser);
+
+                    makeToast("Deleted camera " + idx + " with ID: " + cameraID);
                 }
-            });
+            }
+            @Override
+            public void onCancelled(DatabaseError arg0) {
+            }
+        });
 
 
-
-        }
     }
 
 

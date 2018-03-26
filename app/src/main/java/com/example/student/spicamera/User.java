@@ -13,8 +13,7 @@ public class User {
     public String camera3;
     public String camera4;
 
-
-    public User(String userID,String deviceID,String email){
+    public User(String userID,String deviceID,String email) {
         this.deviceID = deviceID;
         this.userID = userID;
         this.email = email;
@@ -24,8 +23,42 @@ public class User {
         this.camera4 = "";
     }
 
+    public User() {
+        this.deviceID = "";
+        this.userID = "";
+        this.email = "";
+        this.camera1 = "";
+        this.camera2 = "";
+        this.camera3 = "";
+        this.camera4 = "";
+    }
+
     public void setUserID(String userID){
         this.userID=userID;
+    }
+
+    public void setDeviceID(String deviceID) {
+        this.deviceID = deviceID;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setCamera1(String camera1) {
+        this.camera1 = camera1;
+    }
+
+    public void setCamera2(String camera2) {
+        this.camera2 = camera2;
+    }
+
+    public void setCamera3(String camera3) {
+        this.camera3 = camera3;
+    }
+
+    public void setCamera4(String camera4) {
+        this.camera4 = camera4;
     }
 
     public String getDeviceID(){
