@@ -132,7 +132,7 @@ public class RegisterActivity extends AppCompatActivity {
                     final User userRetrieved = snapshot.getValue(User.class);
                     String cameraIDExisting = "";
 
-                    //Get the camera id from what the user selectec with the rdio button list
+                    //Get the camera id from what the user selected with the radio button list
                     switch (idx) {
                         case 1:
                             cameraIDExisting = userRetrieved.getCamera1();
@@ -150,7 +150,9 @@ public class RegisterActivity extends AppCompatActivity {
 
                     //If the camera ID already exists and is something else, tell the user to delete it first
                     if (!cameraID.equals(cameraIDExisting) && !cameraIDExisting.equals("")) {
-                        makeToast("Camera " + idx + " already has a camera registered! Please delete it first.");
+                        makeToast("Camera " + idx + " already has a different camera registered! Please delete it first.");
+                    } else if (cameraID.equals(cameraIDExisting)) {
+                        makeToast("ID: " + cameraID + " is already registered to Camera " + idx + "!");
                     } else {
                         //Get the camera object from the database
                         myRefCamera.child(cameraID).addListenerForSingleValueEvent(new ValueEventListener() {
