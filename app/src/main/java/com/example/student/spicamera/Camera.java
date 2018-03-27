@@ -5,24 +5,24 @@ package com.example.student.spicamera;
  */
 
 public class Camera {
-    public String IP;
+    public String ip;
     public String cameraStatus;
     public String registeredTo;
 
-    public Camera(String IP,String cameraStatus,String registeredTo){
-        this.IP = IP;
+    public Camera(String ip,String cameraStatus,String registeredTo){
+        this.ip = ip;
         this.cameraStatus = cameraStatus;
         this.registeredTo = registeredTo;
     }
 
     public Camera() {
-        this.IP = "";
-        this.cameraStatus = "";
-        this.registeredTo = "";
+        this.ip = "poo";
+        this.cameraStatus = "poo";
+        this.registeredTo = "poo";
     }
 
-    public void setIP(String IP) {
-        this.IP = IP;
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 
     public void setCameraStatus(String cameraStatus) {
@@ -33,8 +33,8 @@ public class Camera {
         this.registeredTo = registeredTo;
     }
 
-    public String getIP(){
-        return this.IP;
+    public String getIp(){
+        return this.ip;
     }
     public String getCameraStatus(){
         return this.cameraStatus;

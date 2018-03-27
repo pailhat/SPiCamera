@@ -116,87 +116,123 @@ public class RegisterActivity extends AppCompatActivity {
 
         final String cameraID = mTextMessage.getText().toString();
 
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final DatabaseReference myRefCamera = database.getReference("cameras");
+        final DatabaseReference myRefUser = database.getReference("users");
+
+        final String userId = user.getUid();
+
         if (cameraID.equals("")) {
             makeToast("Please enter a camera ID first.");
         } else {
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-            final DatabaseReference myRefCamera = database.getReference("cameras");
-            final DatabaseReference myRefUser = database.getReference("users");
-
-            final String userId = user.getUid();
-
-            myRefCamera.child(cameraID).addListenerForSingleValueEvent(new ValueEventListener() {
+            //Get the user's object from the database
+            myRefUser.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
-                    if (snapshot.exists()) {
-                        Camera camRetrieved = snapshot.getValue(Camera.class);
+                    final User userRetrieved = snapshot.getValue(User.class);
+                    String cameraIDExisting = "";
 
-                        if (camRetrieved.getRegisteredTo().equals(userId)) {
+                    //Get the camera id from what the user selectec with the rdio button list
+                    switch (idx) {
+                        case 1:
+                            cameraIDExisting = userRetrieved.getCamera1();
+                            break;
+                        case 2:
+                            cameraIDExisting = userRetrieved.getCamera2();
+                            break;
+                        case 3:
+                            cameraIDExisting = userRetrieved.getCamera3();
+                            break;
+                        case 4:
+                            cameraIDExisting = userRetrieved.getCamera4();
+                            break;
+                    }
 
-                            //Check if the camera is registered to the user already
-                            //delete that spot if it is
-                            myRefUser.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot snapshot) {
-                                    //Get user as object
-                                    User userRet = snapshot.getValue(User.class);
-                                    //Check each camera we have
-                                    int idToDelete = 0;
-
-                                    if (cameraID.equals(userRet.getCamera1())) {
-                                        idToDelete = 1;
-                                    } else if (cameraID.equals(userRet.getCamera2())) {
-                                        idToDelete = 2;
-                                    } else if (cameraID.equals(userRet.getCamera3())) {
-                                        idToDelete = 3;
-                                    } else if (cameraID.equals(userRet.getCamera4())) {
-                                        idToDelete = 4;
-                                    }
-
-                                    if (idToDelete > 0) {
-                                        //Delete the camera where we have it already in the user's object
-                                        Map<String, Object> updatesUser = new HashMap<>();
-                                        updatesUser.put("camera" + idToDelete, "");
-
-                                        myRefUser.child(userId).updateChildren(updatesUser);
-                                    }
-                                }
-                                @Override
-                                public void onCancelled(DatabaseError arg0) {
-                                }
-                            });
-
-                            //Register the camera--------
-                            //Update the registeredTo field of the cameraID specified
-                            Map<String, Object> updatesCamera = new HashMap<>();
-                            updatesCamera.put("registeredTo", userId);
-
-                            myRefCamera.child(cameraID).updateChildren(updatesCamera);
-
-                            //Update the user object and put the camera in
-                            Map<String, Object> updatesUser = new HashMap<>();
-                            updatesUser.put("camera" + idx, cameraID);
-
-                            myRefUser.child(userId).updateChildren(updatesUser);
-
-                            makeToast("Registered camera " + idx + " with ID: " + cameraID);
-
-                        } else {
-                            makeToast("That camera is not registered to your account.");
-                        }
-
+                    //If the camera ID already exists and is something else, tell the user to delete it first
+                    if (!cameraID.equals(cameraIDExisting) && !cameraIDExisting.equals("")) {
+                        makeToast("Camera " + idx + " already has a camera registered! Please delete it first.");
                     } else {
-                        makeToast("CAMERA DOES NOT EXIST");
+                        //Get the camera object from the database
+                        myRefCamera.child(cameraID).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot snapshot) {
+                                if (snapshot.exists()) {
+                                    Camera camRetrieved = snapshot.getValue(Camera.class);
+
+                                    //If its registered to someone else deny the user ability to register
+                                    if (!camRetrieved.getRegisteredTo().equals(userId) && !camRetrieved.getRegisteredTo().equals("None")) {
+                                        makeToast("That camera is not registered to your account.");
+                                    } else {
+                                        Map<String, Object> updatesUser = new HashMap<>();
+
+                                        //If the camera is registered to the user clear it for the user
+                                        //Anywhere thats not where we're registering it to.
+                                        if (camRetrieved.getRegisteredTo().equals(userId)) {
+
+                                            //Check if the camera is registered to the user already
+                                            //delete that spot if it is
+
+                                            int idToDelete = 0;
+
+                                            if (cameraID.equals(userRetrieved.getCamera1())) {
+                                                idToDelete = 1;
+                                                if (idToDelete != idx) {
+                                                    updatesUser.put("camera" + idToDelete, "");
+                                                }
+                                            }
+                                            if (cameraID.equals(userRetrieved.getCamera2())) {
+                                                idToDelete = 2;
+                                                if (idToDelete != idx) {
+                                                    updatesUser.put("camera" + idToDelete, "");
+                                                }
+                                            }
+                                            if (cameraID.equals(userRetrieved.getCamera3())) {
+                                                idToDelete = 3;
+                                                if (idToDelete != idx) {
+                                                    updatesUser.put("camera" + idToDelete, "");
+                                                }
+                                            }
+                                            if (cameraID.equals(userRetrieved.getCamera4())) {
+                                                idToDelete = 4;
+                                                if (idToDelete != idx) {
+                                                    updatesUser.put("camera" + idToDelete, "");
+                                                }
+                                            }
+
+                                        }
+
+                                        //Register the camera--------Finally
+                                        //CAMERA OBJECT: Update the registeredTo field of the cameraID specified
+                                        Map<String, Object> updatesCamera = new HashMap<>();
+                                        updatesCamera.put("registeredTo", userId);
+                                        myRefCamera.child(cameraID).updateChildren(updatesCamera);
+
+                                        //USER OBJECT: Update the user object and put the camera in
+                                        updatesUser.put("camera" + idx, cameraID);
+                                        myRefUser.child(userId).updateChildren(updatesUser);
+
+                                        makeToast("Registered camera " + idx + " with ID: " + cameraID);
+
+                                    }
+
+                                } else {
+                                    makeToast("CAMERA DOES NOT EXIST");
+                                }
+                            }
+                            @Override
+                            public void onCancelled(DatabaseError arg0) {
+                            }
+                        });
                     }
                 }
+
                 @Override
                 public void onCancelled(DatabaseError arg0) {
                 }
             });
-
-
-
         }
+
+
     }
 
     private void deleteCamera() {
