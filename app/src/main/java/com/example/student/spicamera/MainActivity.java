@@ -36,8 +36,8 @@ public class MainActivity extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
 
     private WebView wv1;
-    String url = "";
-
+    private String url = "";
+    private DatabaseReference myRefCamera;
     private EditText urlText;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -80,10 +80,10 @@ public class MainActivity extends AppCompatActivity {
         final String cameraID = (String) getIntent().getExtras().get("CAMERA_ID");
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        final DatabaseReference myRefCamera = database.getReference("cameras");
+        final DatabaseReference myRefCamera = database.getReference("cameras").child(cameraID);
 
         //Query for comera
-        myRefCamera.child(cameraID).addListenerForSingleValueEvent(new ValueEventListener() {
+        myRefCamera.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 Camera camRetrieved = snapshot.getValue(Camera.class);
@@ -91,19 +91,8 @@ public class MainActivity extends AppCompatActivity {
                 url = camRetrieved.getIp();
 
                 makeToast(url);
+                loadCameraFeed(url);
 
-                wv1=(WebView)findViewById(R.id.webView);
-                wv1.setWebViewClient(new MyBrowser());
-
-                wv1.setInitialScale(1);
-                wv1.getSettings().setLoadsImagesAutomatically(true);
-                wv1.getSettings().setLoadWithOverviewMode(true);
-                wv1.getSettings().setUseWideViewPort(true);
-                wv1.getSettings().setJavaScriptEnabled(true);
-                wv1.getSettings().setBuiltInZoomControls(true);
-                wv1.getSettings().setDisplayZoomControls(false);
-                wv1.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
-                wv1.loadUrl(url);
             }
             @Override
             public void onCancelled(DatabaseError arg0) {
@@ -115,6 +104,21 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
+    }
+
+    private void loadCameraFeed(String url) {
+        wv1=(WebView)findViewById(R.id.webView);
+        wv1.setWebViewClient(new MyBrowser());
+
+        wv1.setInitialScale(1);
+        wv1.getSettings().setLoadsImagesAutomatically(true);
+        wv1.getSettings().setLoadWithOverviewMode(true);
+        wv1.getSettings().setUseWideViewPort(true);
+        wv1.getSettings().setJavaScriptEnabled(true);
+        wv1.getSettings().setBuiltInZoomControls(true);
+        wv1.getSettings().setDisplayZoomControls(false);
+        wv1.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
+        wv1.loadUrl(url);
     }
 
     private void makeToast(String text) {
@@ -157,6 +161,11 @@ public class MainActivity extends AppCompatActivity {
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             view.loadUrl(url);
             return true;
+        }
+        @Override
+        public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+            super.onReceivedError(view, errorCode, description, failingUrl);
+            view.loadData("<html>Camera feed not availabe!</html>", "", "");
         }
     }
 }
