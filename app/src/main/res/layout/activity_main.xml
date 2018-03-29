@@ -54,21 +54,15 @@
                 android:text="Right" />
         </LinearLayout>
 
-        <EditText
-            android:id="@+id/url_text"
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/floatingActionButton"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_gravity="center"
-            android:layout_weight="2"
-            android:textColor="#ffffff"
-            android:text="" />
-        <Button
-            android:id="@+id/load_url_button"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_gravity="center"
             android:layout_weight="1"
-            android:text="Refresh" />
+            android:layout_gravity="end"
+            android:clickable="true"
+            app:srcCompat="@drawable/cam_icon" />
+
 
     </LinearLayout>
 
