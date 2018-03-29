@@ -124,7 +124,6 @@ public class HomeActivity extends AppCompatActivity {
                         cv.setOnClickListener(new View.OnClickListener() {
                             public void onClick(View v) {
                                 goToCamera(cameraID);
-                                makeToast(cameraID);
                             }
                         });
                     }

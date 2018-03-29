@@ -11,6 +11,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -18,6 +19,14 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     // [START declare_auth]
@@ -27,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
 
     private WebView wv1;
+    String url = "";
 
     private EditText urlText;
 
@@ -65,44 +75,52 @@ public class MainActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         //[END GOOGLE]
 
-        wv1=(WebView)findViewById(R.id.webView);
-        wv1.setWebViewClient(new MyBrowser());
 
-        //Get the camera ID and
-        String url = (String) getIntent().getExtras().get("IP");
+        //Get the camera ID and set the webview
+        final String cameraID = (String) getIntent().getExtras().get("CAMERA_ID");
 
-        wv1.setInitialScale(1);
-        wv1.getSettings().setLoadsImagesAutomatically(true);
-        wv1.getSettings().setLoadWithOverviewMode(true);
-        wv1.getSettings().setUseWideViewPort(true);
-        wv1.getSettings().setJavaScriptEnabled(true);
-        wv1.getSettings().setBuiltInZoomControls(true);
-        wv1.getSettings().setDisplayZoomControls(false);
-        wv1.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
-        wv1.loadUrl(url);
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final DatabaseReference myRefCamera = database.getReference("cameras");
 
-        urlText = (EditText) findViewById(R.id.url_text);
+        //Query for comera
+        myRefCamera.child(cameraID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                Camera camRetrieved = snapshot.getValue(Camera.class);
 
+                url = camRetrieved.getIp();
 
+                makeToast(url);
 
-        urlText.setText(url);
+                wv1=(WebView)findViewById(R.id.webView);
+                wv1.setWebViewClient(new MyBrowser());
 
-        Button urlButton = (Button) findViewById(R.id.load_url_button);
-        urlButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Do something in response to button click
-                //Get the text from edit text and save it into input
-                String input = urlText.getText().toString();
-
-                wv1.loadUrl(input);
+                wv1.setInitialScale(1);
+                wv1.getSettings().setLoadsImagesAutomatically(true);
+                wv1.getSettings().setLoadWithOverviewMode(true);
+                wv1.getSettings().setUseWideViewPort(true);
+                wv1.getSettings().setJavaScriptEnabled(true);
+                wv1.getSettings().setBuiltInZoomControls(true);
+                wv1.getSettings().setDisplayZoomControls(false);
+                wv1.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
+                wv1.loadUrl(url);
+            }
+            @Override
+            public void onCancelled(DatabaseError arg0) {
             }
         });
+
+
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
     }
 
+    private void makeToast(String text) {
+        Toast toast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+        toast.show();
+    }
 
     private void goHome() {
         Intent intent = new Intent(this, HomeActivity.class);

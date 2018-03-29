@@ -16,9 +16,9 @@ public class Camera {
     }
 
     public Camera() {
-        this.ip = "poo";
-        this.cameraStatus = "poo";
-        this.registeredTo = "poo";
+        this.ip = "";
+        this.cameraStatus = "";
+        this.registeredTo = "";
     }
 
     public void setIp(String ip) {
