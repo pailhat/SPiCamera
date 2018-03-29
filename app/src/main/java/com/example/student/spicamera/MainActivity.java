@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         wv1=(WebView)findViewById(R.id.webView);
         wv1.setWebViewClient(new MyBrowser());
 
-        //IP Adress of the rPi
+        //Get the camera ID and
         String url = (String) getIntent().getExtras().get("IP");
 
         wv1.setInitialScale(1);
