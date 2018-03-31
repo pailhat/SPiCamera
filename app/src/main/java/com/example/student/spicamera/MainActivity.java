@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference myRefCamera = database.getReference("cameras").child(cameraID);
 
-        //Query for comera
+        //Query for camera
         myRefCamera.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
