@@ -15,7 +15,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -67,6 +66,7 @@ public class NotificationsActivity extends AppCompatActivity {
     };
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,18 +83,25 @@ public class NotificationsActivity extends AppCompatActivity {
         user = mAuth.getCurrentUser();
 
         dbReference = FirebaseDatabase.getInstance().getReference("notifications");//Get a reference to the 'notifications' part of the database
+        //dbReference.orderByChild("receiver").equalTo(user.getUid());
+
         adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,arrayList);
         notificationsList = (ListView)findViewById(R.id.notificationsListView); //initialize the listView object
         notificationsList.setAdapter(adapter);
 
+        //The block below handles changes in the database, and manages the array list used for the list view
         dbReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                String cameraString = dataSnapshot.child("camera").getValue(String.class);
-                String dateString = dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
+                if(user.getUid().equals(dataSnapshot.child("receiver").getValue(String.class))){
+                    String cameraString = "Camera ID: " + dataSnapshot.child("camera").getValue(String.class);
+                    String dateString = "When: " + dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
 
-                arrayList.add(cameraString +"\n"+dateString);
-                adapter.notifyDataSetChanged();
+                    arrayList.add(cameraString + "\n" + dateString );
+                    adapter.notifyDataSetChanged();
+                }
+
+
             }
 
             @Override
@@ -104,11 +111,13 @@ public class NotificationsActivity extends AppCompatActivity {
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                String cameraString = dataSnapshot.child("camera").getValue(String.class);
-                String dateString = dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
-                
-                arrayList.remove(cameraString +"\n"+dateString);
-                adapter.notifyDataSetChanged();
+                if(user.getUid().equals(dataSnapshot.child("receiver").getValue(String.class))) {
+                    String cameraString = dataSnapshot.child("camera").getValue(String.class);
+                    String dateString = dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
+                    String wholeString = cameraString + "\n" + dateString;
+                    arrayList.remove(wholeString);
+                    adapter.notifyDataSetChanged();
+                }
             }
 
             @Override
