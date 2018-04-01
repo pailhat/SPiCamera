@@ -11,6 +11,8 @@ import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,11 +23,14 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import java.util.ArrayList;
+
 public class NotificationsActivity extends AppCompatActivity {
 
     /*these are some objects which are used within the onCreate function*/
@@ -33,6 +38,11 @@ public class NotificationsActivity extends AppCompatActivity {
     private FirebaseUser user;
     private GoogleSignInClient mGoogleSignInClient;
     private TextView mTextMessage;
+    private ListView notificationsList;
+    private DatabaseReference dbReference;
+
+    private ArrayList<String> arrayList = new ArrayList<>();
+    private ArrayAdapter<String> adapter; //the adapter between the database and listView
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -62,6 +72,7 @@ public class NotificationsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notifications);
 
+        //Below is some necessary code for the google sign-in/off
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -71,6 +82,47 @@ public class NotificationsActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         user = mAuth.getCurrentUser();
 
+        dbReference = FirebaseDatabase.getInstance().getReference("notifications");//Get a reference to the 'notifications' part of the database
+        adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,arrayList);
+        notificationsList = (ListView)findViewById(R.id.notificationsListView); //initialize the listView object
+        notificationsList.setAdapter(adapter);
+
+        dbReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                String cameraString = dataSnapshot.child("camera").getValue(String.class);
+                String dateString = dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
+
+                arrayList.add(cameraString +"\n"+dateString);
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                String cameraString = dataSnapshot.child("camera").getValue(String.class);
+                String dateString = dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
+                
+                arrayList.remove(cameraString +"\n"+dateString);
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        //Below is the code to generate the navbar for this activity
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.getMenu().getItem(2).setChecked(true);
         Log.w("BottomNav", navigation.getSelectedItemId() + "");
