@@ -24,5 +24,10 @@
     <string name="title_notifications">Notifications</string>
     <string name="register_hint">Enter your camera\'s ID</string>
     <string name="register_text">Select which camera you want to register</string>
-    <string name="title_activity_notification">NotificationActivity</string>
+    <string name="title_activity_notification">Notifications</string>
+
+
+    <string name="hello">Hello World, ImageTextListViewActivity!</string>
+    <string name="name">ListViewBaseAdapter</string>
+    <string name="image">Thumbnail</string>
 </resources>

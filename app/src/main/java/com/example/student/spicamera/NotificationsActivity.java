@@ -1,5 +1,6 @@
 package com.example.student.spicamera;
 
+import android.app.LauncherActivity;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.content.Intent;
@@ -99,6 +100,11 @@ public class NotificationsActivity extends AppCompatActivity {
 
                     arrayList.add(cameraString + "\n" + dateString );
                     adapter.notifyDataSetChanged();
+
+                    //makeToast(notificationsList.getChildCount()+"");
+                    //adapter.getView(arrayList.size() -1,null,notificationsList).setBackgroundColor(getResources().getColor(R.color.notificationSeen));
+
+                    //notificationsList.getChildAt(arrayList.size()-1).setBackgroundColor(getResources().getColor(R.color.notificationSeen));
                 }
 
 

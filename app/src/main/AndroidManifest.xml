@@ -83,8 +83,8 @@
             android:label="@string/title_activity_register" />
         <activity
             android:name=".NotificationsActivity"
-            android:label="@string/title_activity_notification"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:label="@string/title_activity_notification" />
+        <activity android:name=".ImageActivity"></activity>
     </application>
 
 </manifest>

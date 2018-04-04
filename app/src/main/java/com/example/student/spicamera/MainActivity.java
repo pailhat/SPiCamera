@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
@@ -52,6 +53,9 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.navigation_register:
                     goToRegisterPage();
                     return true;
+                case R.id.navigation_notifications: //TODO: figure this out
+                    goToNotifications();
+                    return true;
                 case R.id.navigation_signout:
                     signOut();
                     return true;
@@ -99,6 +103,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.floatingActionButton);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                goToImages();
+            }
+        });
 
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
@@ -151,11 +161,19 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    private void goToImages() {
+        Intent intent = new Intent(this, ImageActivity.class);
+        startActivity(intent);
+    }
+
+    private void goToNotifications(){
+        Intent intent = new Intent(this,NotificationsActivity.class); //TODO: make activity
+        startActivity(intent);
+    }
     private void goToRegisterPage() {
         Intent intent = new Intent(this, RegisterActivity.class);
         startActivity(intent);
     }
-
     private class MyBrowser extends WebViewClient {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -165,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             super.onReceivedError(view, errorCode, description, failingUrl);
-            view.loadData("<html>Camera feed not availabe!</html>", "", "");
+            view.loadData("<html><center><BR><BR><BR><b>Camera feed not availabe!</b></center></html>", "", "");
         }
     }
 }
