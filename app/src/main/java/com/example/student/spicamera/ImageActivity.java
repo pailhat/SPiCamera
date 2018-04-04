@@ -15,10 +15,20 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -41,41 +51,105 @@ public class ImageActivity extends AppCompatActivity implements
     ListView listView;
     List<RowItem> rowItems;
 
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
+    private GoogleSignInClient mGoogleSignInClient;
+    private DatabaseReference dbReference;
+    private CustomListViewAdapter adapter;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image);
 
+        //Below is some necessary code for the google sign-in/off
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+
+        mAuth = FirebaseAuth.getInstance();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        user = mAuth.getCurrentUser();
+
+        dbReference = FirebaseDatabase.getInstance().getReference("notifications");//Get a reference to the 'notifications' part of the database
+
         //Creates the list items with the images from the arrays above
         //here we jsut need to query firebase to get this information instead
         //TODO Query firebase for all images associated with the camera
-        StorageReference myRef = FirebaseStorage.getInstance().getReference().child("dummyCameraID");
+
+        final StorageReference myRef = FirebaseStorage.getInstance().getReference().child(user.getUid());
 
         rowItems = new ArrayList<RowItem>();
         final Context context = this;
 
-        //TODO use databse instead of storage to get the URLS
-        myRef.child("2018-03-21 20:22:36.361915").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+        listView = (ListView) findViewById(R.id.imagesListView);
+        adapter = new CustomListViewAdapter(context,
+                R.layout.list_item, rowItems);
+        listView.setAdapter(adapter);
+
+        //The block below handles changes in the database, and manages the array list used for the list view
+        dbReference.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onSuccess(Uri uri) {
-                // Got the download URL for 'users/me/profile.png'
-                makeToast(uri.toString());
-                RowItem item = new RowItem(uri.toString(), "HAHA", "ha");
-                rowItems.add(item);
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if(user.getUid().equals(dataSnapshot.child("receiver").getValue(String.class))){
+                    String cameraString = dataSnapshot.child("camera").getValue(String.class);
+                    String dateString = dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
+
+                    //TODO use databse instead of storage to get the URLS
+                    myRef.child(cameraString).child(dateString).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            // Got the download URL for 'users/me/profile.png'
+                            makeToast(uri.toString());
+                            RowItem item = new RowItem(uri.toString(), "HAHA", "ha");
+                            rowItems.add(item);
+                        }
+                    }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Uri> task) {
+
+                            adapter.notifyDataSetChanged();
+
+                        }
+                    });
+
+                }
+
+
             }
-        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+
             @Override
-            public void onComplete(@NonNull Task<Uri> task) {
-                listView = (ListView) findViewById(R.id.imagesListView);
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-                CustomListViewAdapter adapter = new CustomListViewAdapter(context,
-                        R.layout.list_item, rowItems);
-                listView.setAdapter(adapter);
+            }
 
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                if(user.getUid().equals(dataSnapshot.child("receiver").getValue(String.class))) {
+
+                    //TODO make this work properly
+                    String cameraString = dataSnapshot.child("camera").getValue(String.class);
+                    String dateString = dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
+                    String wholeString = cameraString + "\n" + dateString;
+                    //rowItems.remove(wholeString);
+                    adapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         });
+
+
 
 
         //listView.setOnItemClickListener(this);
