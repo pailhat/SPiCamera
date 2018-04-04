@@ -100,7 +100,9 @@ public class HomeActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot snapshot) {
                 final User userRetrieved = snapshot.getValue(User.class);
                 int cardId = 0;
+                int cardTextId=0;
                 CardView cv;
+                TextView cvText;
                 String cameraIDExisting = "";
 
                 //Get the camera id from what the user selected with the radio button list
@@ -109,18 +111,22 @@ public class HomeActivity extends AppCompatActivity {
                         case 1:
                             cameraIDExisting = userRetrieved.getCamera1();
                             cardId = R.id.cv_1;
+                            cardTextId = R.id.card_text_1;
                             break;
                         case 2:
                             cameraIDExisting = userRetrieved.getCamera2();
                             cardId = R.id.cv_2;
+                            cardTextId = R.id.card_text_2;
                             break;
                         case 3:
                             cameraIDExisting = userRetrieved.getCamera3();
                             cardId = R.id.cv_3;
+                            cardTextId = R.id.card_text_3;
                             break;
                         case 4:
                             cameraIDExisting = userRetrieved.getCamera4();
                             cardId = R.id.cv_4;
+                            cardTextId = R.id.card_text_4;
                             break;
                     }
 
@@ -128,7 +134,9 @@ public class HomeActivity extends AppCompatActivity {
 
                     if (!cameraID.equals("")) {
                         cv = (CardView) findViewById(cardId);
-
+                        cvText = (TextView) findViewById(cardTextId);
+                        cvText.setTextSize(cvText.getTextSize()/3);
+                        cvText.setText(cvText.getText()+": "+cameraIDExisting);
                         cv.setBackgroundColor(getResources().getColor(R.color.cardBackground));
                         cv.setOnClickListener(new View.OnClickListener() {
                             public void onClick(View v) {

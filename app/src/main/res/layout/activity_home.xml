@@ -38,7 +38,7 @@ tools:context="com.example.student.spicamera.MainActivity">
                     android:src="@drawable/cam_icon" />
 
                 <TextView
-                    android:id="@+id/person_name"
+                    android:id="@+id/card_text_1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -75,6 +75,7 @@ tools:context="com.example.student.spicamera.MainActivity">
                     />
 
                 <TextView
+                    android:id="@+id/card_text_2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
@@ -112,6 +113,7 @@ tools:context="com.example.student.spicamera.MainActivity">
                     />
 
                 <TextView
+                    android:id="@+id/card_text_3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
@@ -149,6 +151,7 @@ tools:context="com.example.student.spicamera.MainActivity">
                     />
 
                 <TextView
+                    android:id="@+id/card_text_4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
