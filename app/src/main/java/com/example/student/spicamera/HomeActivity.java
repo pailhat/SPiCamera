@@ -135,6 +135,7 @@ public class HomeActivity extends AppCompatActivity {
                     if (!cameraID.equals("")) {
                         cv = (CardView) findViewById(cardId);
                         cvText = (TextView) findViewById(cardTextId);
+
                         cvText.setTextSize(cvText.getTextSize()/3);
                         cvText.setText(cvText.getText()+": "+cameraIDExisting);
                         cv.setBackgroundColor(getResources().getColor(R.color.cardBackground));
