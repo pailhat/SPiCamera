@@ -94,7 +94,7 @@ public class NotificationsActivity extends AppCompatActivity {
         dbReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                if(user.getUid().equals(dataSnapshot.child("receiver").getValue(String.class))){
+                if(user.getUid().equals(dataSnapshot.child("receiver").getValue(String.class)) && dataSnapshot.child("mode").getValue(String.class).equals("auto")){
                     String cameraString = "Camera ID: " + dataSnapshot.child("camera").getValue(String.class);
                     String dateString = "When: " + dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
 

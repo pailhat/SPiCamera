@@ -1,6 +1,7 @@
 package com.example.student.spicamera;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.AdapterView;
@@ -97,14 +99,16 @@ public class ImageActivity extends AppCompatActivity implements
                     String cameraString = dataSnapshot.child("camera").getValue(String.class);
                     final String dateString = dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
 
-                    //TODO use databse instead of storage to get the URLS
+                    Log.w("ImageActvitiy", user.getUid() + "\n" + cameraString+ "\n" + dateString);
+
                     myRef.child(cameraString).child(dateString).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
-                            // Got the download URL for 'users/me/profile.png'
+
                             makeToast(uri.toString());
                             RowItem item = new RowItem(uri.toString(), "HAHA", "ha", dateString);
                             rowItems.add(item);
+
                         }
                     }).addOnCompleteListener(new OnCompleteListener<Uri>() {
                         @Override
@@ -151,7 +155,7 @@ public class ImageActivity extends AppCompatActivity implements
 
 
 
-        //listView.setOnItemClickListener(this);
+        listView.setOnItemClickListener(this);
 
     }
 
@@ -169,5 +173,13 @@ public class ImageActivity extends AppCompatActivity implements
                 "Item " + (position + 1) + ": " + rowItems.get(position),
                 Toast.LENGTH_SHORT);
         toast.show();
+
+
+        Intent intent = new Intent(this, ViewImageActivity.class);
+        intent.putExtra("IMAGE_URL", rowItems.get(position).getImageUrl());
+
+        startActivity(intent);
+
+
     }
 }

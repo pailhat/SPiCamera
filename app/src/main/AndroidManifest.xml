@@ -84,7 +84,14 @@
         <activity
             android:name=".NotificationsActivity"
             android:label="@string/title_activity_notification" />
-        <activity android:name=".ImageActivity"></activity>
+        <activity android:name=".ImageActivity" />
+        <activity
+            android:name=".ViewImageActivity"
+
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="landscape"
+            android:label="@string/title_activity_view_image"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
