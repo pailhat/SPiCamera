@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private String url = "";
     private DatabaseReference myRefCamera;
     private EditText urlText;
+    private CameraController cameraController;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -94,8 +95,11 @@ public class MainActivity extends AppCompatActivity {
 
                 url = camRetrieved.getIp();
 
-                makeToast(url);
+                //makeToast(url);
                 loadCameraFeed(url);
+                cameraController = new CameraController(url);
+
+                makeToast(cameraController.getIp());
 
             }
             @Override
