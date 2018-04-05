@@ -60,7 +60,7 @@ public class CameraController {
             dout.flush();
             dout.close();
             soc.close();
-            
+
         } catch(Exception e){
             e.printStackTrace();
         }
