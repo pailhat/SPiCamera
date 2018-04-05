@@ -95,7 +95,7 @@ public class ImageActivity extends AppCompatActivity implements
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if(user.getUid().equals(dataSnapshot.child("receiver").getValue(String.class))){
                     String cameraString = dataSnapshot.child("camera").getValue(String.class);
-                    String dateString = dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
+                    final String dateString = dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
 
                     //TODO use databse instead of storage to get the URLS
                     myRef.child(cameraString).child(dateString).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -103,7 +103,7 @@ public class ImageActivity extends AppCompatActivity implements
                         public void onSuccess(Uri uri) {
                             // Got the download URL for 'users/me/profile.png'
                             makeToast(uri.toString());
-                            RowItem item = new RowItem(uri.toString(), "HAHA", "ha");
+                            RowItem item = new RowItem(uri.toString(), "HAHA", "ha", dateString);
                             rowItems.add(item);
                         }
                     }).addOnCompleteListener(new OnCompleteListener<Uri>() {
@@ -129,11 +129,10 @@ public class ImageActivity extends AppCompatActivity implements
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 if(user.getUid().equals(dataSnapshot.child("receiver").getValue(String.class))) {
 
-                    //TODO make this work properly
-                    String cameraString = dataSnapshot.child("camera").getValue(String.class);
                     String dateString = dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
-                    String wholeString = cameraString + "\n" + dateString;
-                    //rowItems.remove(wholeString);
+
+                    rowItems.remove(new RowItem(dateString));
+
                     adapter.notifyDataSetChanged();
                 }
             }
