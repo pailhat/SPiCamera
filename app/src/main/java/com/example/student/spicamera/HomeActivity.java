@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -136,7 +137,8 @@ public class HomeActivity extends AppCompatActivity {
                         cv = (CardView) findViewById(cardId);
                         cvText = (TextView) findViewById(cardTextId);
 
-                        cvText.setTextSize(cvText.getTextSize()/3);
+                        cvText.setTextSize(TypedValue.COMPLEX_UNIT_SP,25);
+
                         cvText.setText(cvText.getText()+": "+cameraIDExisting);
                         cv.setBackgroundColor(getResources().getColor(R.color.cardBackground));
                         cv.setOnClickListener(new View.OnClickListener() {

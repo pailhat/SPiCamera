@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                 //makeToast(url);
                 loadCameraFeed(url);
                 cameraController = new CameraController(url);
-
+                setUpCameraButtons();
                 makeToast(cameraController.getIp());
 
             }
@@ -134,7 +134,40 @@ public class MainActivity extends AppCompatActivity {
         wv1.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
         wv1.loadUrl(url);
     }
+    private void setUpCameraButtons(){
+        Button leftButton = (Button) findViewById(R.id.buttonLeft);
+        leftButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                try {
+                    cameraController.left();
+                } catch (Exception e) {
+                    //Nothing
+                }
+            }
+        });
 
+        Button rightButton = (Button) findViewById(R.id.buttonRight);
+        rightButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                try {
+                    cameraController.right();
+                } catch (Exception e) {
+                    //Nothing
+                }
+            }
+        });
+
+        Button snapButton = (Button) findViewById(R.id.buttonSnapShot);
+        snapButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                try {
+                    cameraController.takeSnap();
+                } catch (Exception e) {
+                    //Nothing
+                }
+            }
+        });
+    }
     private void makeToast(String text) {
         Toast toast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
         toast.show();
