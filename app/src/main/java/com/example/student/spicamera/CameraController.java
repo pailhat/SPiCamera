@@ -52,29 +52,18 @@ public class CameraController {
     }
 
     private void sendCharacter(String c) throws Exception {
-        //String response;
-        //BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
-        try {
-            Log.w("CameraController", "0. Sending " + c);
-            Socket clientSocket = new Socket(this.ip, PORT);
-            Log.w("CameraController", "0.5. Sending " + c);
-            DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-            Log.w("CameraController", "1. Sending " + c);
-            outToServer.writeBytes( c + '\n');
+        try{
+            Socket soc = new Socket(this.ip,PORT);
 
-            clientSocket.close();
-
-            Log.w("CameraController", "2. Sending " + c);
-        }catch(Exception e){
-            Log.w("CameraController", e.getMessage());
-            Log.w("CameraController", e.toString());
+            DataOutputStream dout = new DataOutputStream(soc.getOutputStream());
+            dout.writeUTF(c + "\n");
+            dout.flush();
+            dout.close();
+            soc.close();
+            
+        } catch(Exception e){
+            e.printStackTrace();
         }
-
-        //BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-
-        //response = inFromServer.readLine();
-        //System.out.println(response);
 
     }
 
