@@ -10,10 +10,26 @@ import java.net.Socket;
  */
 
 public class CameraController {
+    private final int PORT = 12000;
+
     private String ip;
 
     public CameraController(String ip) {
-        this.ip = ip;
+        this.ip = parseIp(ip);
+    }
+
+    private String parseIp(String ip) {
+        //Gets just the IP from the camera feed url we have stored in firebase
+        String justTheIp;
+
+        justTheIp = ip.substring(ip.indexOf("@") + 1);
+        justTheIp = justTheIp.substring(0,justTheIp.indexOf(":"));
+
+        return justTheIp;
+    }
+
+    public String getIp() {
+        return this.ip;
     }
 
     public void setIp(String ip) {
@@ -21,34 +37,32 @@ public class CameraController {
     }
 
     public void takeSnap() throws Exception {
-        //TODO send s to camera so it takes a picture
-
-        //THIS ISNT DONE YET I JUST COPY PASTED FROM STACKOVERFLOW
-        String sentence;
-        String modifiedSentence;
-        BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
-
-        Socket clientSocket = new Socket("localhost", 6789);
-        DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-        BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-        sentence = inFromUser.readLine();
-        outToServer.writeBytes(sentence + '\n');
-        modifiedSentence = inFromServer.readLine();
-        System.out.println(modifiedSentence);
-        clientSocket.close();
+        sendCharacter("s");
     }
 
     public void left()  throws Exception {
-        //TODO send s to camera so it takes a picture
+        sendCharacter("l");
     }
 
     public void right()  throws Exception {
-        //TODO send s to camera so it takes a picture
+        sendCharacter("r");
     }
 
-    public static String parseIp(String ip) {
+    private void sendCharacter(String c) throws Exception {
+        //String response;
+        //BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
 
-        return ip;
+        Socket clientSocket = new Socket(this.ip, PORT);
+        DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
+
+        //BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+        outToServer.writeBytes( c );
+
+        //response = inFromServer.readLine();
+        //System.out.println(response);
+        clientSocket.close();
+
     }
+
 }
