@@ -111,17 +111,20 @@ public class NotificationsActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {//TODO: This is where i can implement the unseen notification system
 
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                if(user.getUid().equals(dataSnapshot.child("receiver").getValue(String.class))) {
-                    String cameraString = dataSnapshot.child("camera").getValue(String.class);
-                    String dateString = dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
+                if(user.getUid().equals(dataSnapshot.child("receiver").getValue(String.class)) && dataSnapshot.child("mode").getValue(String.class).equals("auto")) {
+                    String cameraString = "Camera ID: " + dataSnapshot.child("camera").getValue(String.class);
+                    String dateString = "When: " + dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
                     String wholeString = cameraString + "\n" + dateString;
-                    arrayList.remove(wholeString);
+                    if(arrayList.remove(wholeString)){
+                        arrayList.remove(wholeString);
+                        makeToast("Lost from database: " + wholeString);
+                    }
                     adapter.notifyDataSetChanged();
                 }
             }

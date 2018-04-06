@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.List;
 
 import android.util.Log;
 import android.view.ContextThemeWrapper;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -37,7 +39,7 @@ import com.google.firebase.storage.StorageReference;
 public class ImageActivity extends AppCompatActivity implements
         OnItemClickListener {
 
-    public static final String[] titles = new String[] { "Strawberry",
+    /*public static final String[] titles = new String[] { "Strawberry",
             "Banana", "Orange", "Mixed" };
 
     public static final String[] descriptions = new String[] {
@@ -49,7 +51,7 @@ public class ImageActivity extends AppCompatActivity implements
             "https://firebasestorage.googleapis.com/v0/b/spi-camera.appspot.com/o/cAzM9WQkyt%2F2018-03-22%2019%3A44%3A35.043504?alt=media&token=02505b9f-0104-4d36-968c-e3bb5cce2da9",
             "https://firebasestorage.googleapis.com/v0/b/spi-camera.appspot.com/o/cAzM9WQkyt%2F2018-03-22%2019%3A39%3A54.473197?alt=media&token=0fa979fd-bb0f-40fd-99e9-00cbb7a7f2d2",
             "https://firebasestorage.googleapis.com/v0/b/spi-camera.appspot.com/o/cAzM9WQkyt%2F2018-03-22%2019%3A44%3A35.043504?alt=media&token=02505b9f-0104-4d36-968c-e3bb5cce2da9"};
-
+    */
     ListView listView;
     List<RowItem> rowItems;
 
@@ -58,10 +60,33 @@ public class ImageActivity extends AppCompatActivity implements
     private GoogleSignInClient mGoogleSignInClient;
     private DatabaseReference dbReference;
     private CustomListViewAdapter adapter;
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.navigation_home:
+                    goHome();
+                    return true;
+                case R.id.navigation_register:
+                    goToRegisterPage();
+                    return true;
+                case R.id.navigation_notifications:
+                    goToNotifications();
+        return true;
+        case R.id.navigation_signout:
+        signOut();
+        return true;
+    }
+            return false;
+}
+    };
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image);
 
@@ -94,19 +119,19 @@ public class ImageActivity extends AppCompatActivity implements
         //The block below handles changes in the database, and manages the array list used for the list view
         dbReference.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                if(user.getUid().equals(dataSnapshot.child("receiver").getValue(String.class))){
-                    String cameraString = dataSnapshot.child("camera").getValue(String.class);
+            public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
+                if (user.getUid().equals(dataSnapshot.child("receiver").getValue(String.class))) {
+                    final String cameraString = dataSnapshot.child("camera").getValue(String.class);
                     final String dateString = dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
 
-                    Log.w("ImageActvitiy", user.getUid() + "\n" + cameraString+ "\n" + dateString);
+                    Log.w("ImageActvitiy", user.getUid() + "\n" + cameraString + "\n" + dateString);
 
                     myRef.child(cameraString).child(dateString).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
 
                             makeToast(uri.toString());
-                            RowItem item = new RowItem(uri.toString(), "HAHA", "ha", dateString);
+                            RowItem item = new RowItem(uri.toString(), dateString, cameraString, dateString);
                             rowItems.add(item);
 
                         }
@@ -131,7 +156,7 @@ public class ImageActivity extends AppCompatActivity implements
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                if(user.getUid().equals(dataSnapshot.child("receiver").getValue(String.class))) {
+                if (user.getUid().equals(dataSnapshot.child("receiver").getValue(String.class))) {
 
                     String dateString = dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
 
@@ -153,9 +178,14 @@ public class ImageActivity extends AppCompatActivity implements
         });
 
 
-
-
         listView.setOnItemClickListener(this);
+
+        //Below is the code to generate the navbar for this activity
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.getMenu().getItem(2).setChecked(true);
+        Log.w("BottomNav", navigation.getSelectedItemId() + "");
+
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
     }
 
@@ -173,13 +203,42 @@ public class ImageActivity extends AppCompatActivity implements
                 "Item " + (position + 1) + ": " + rowItems.get(position),
                 Toast.LENGTH_SHORT);
         toast.show();
-
-
         Intent intent = new Intent(this, ViewImageActivity.class);
         intent.putExtra("IMAGE_URL", rowItems.get(position).getImageUrl());
-
         startActivity(intent);
 
 
+    }
+
+    private void goHome() {
+        Intent intent = new Intent(this, HomeActivity.class);
+        startActivity(intent);
+    }
+    private void signOut() {
+        // Firebase sign out
+        mAuth.signOut();
+
+        // Google sign out
+        mGoogleSignInClient.signOut().addOnCompleteListener(this,
+                new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        //OPEN Sign In Page
+                        goToSignInPage();
+                    }
+                });
+    }
+
+    private void goToSignInPage() {
+        Intent intent = new Intent(this, GoogleSignInActivity.class);
+        startActivity(intent);
+    }
+    private void goToNotifications(){
+        Intent intent = new Intent(this,NotificationsActivity.class); //TODO: make activity
+        startActivity(intent);
+    }
+    private void goToRegisterPage() {
+        Intent intent = new Intent(this, RegisterActivity.class);
+        startActivity(intent);
     }
 }
