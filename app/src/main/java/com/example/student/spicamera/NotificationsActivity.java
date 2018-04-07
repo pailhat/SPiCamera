@@ -1,6 +1,10 @@
 package com.example.student.spicamera;
 
 import android.app.LauncherActivity;
+import android.content.Context;
+import android.net.Uri;
+import android.graphics.Color;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.content.Intent;
@@ -47,14 +51,19 @@ public class NotificationsActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private GoogleSignInClient mGoogleSignInClient;
-    private TextView mTextMessage;
+    private TextView instructions;
     private ListView notificationsList;
     private DatabaseReference dbReference;
     private StorageReference userImagesRef;
 
-    private int selectedItemIndex;
-    private ArrayList<String> notificationsKeyList = new ArrayList<>();
-    private ArrayList<String> arrayList = new ArrayList<>();
+    private int selectedItemIndex; //When a use long clicks an item from the listView, i quickly some things about the item(it's my only chance to do it)
+    private String selectedItemCamera; //The camera name in the selected notification
+    private String selectedItemDateTime; //Technically the name of the file in the selected notification
+    private Context myContext;             //Context saved soon after onCreate, so that i can use it from inside listeners to launch new activities
+
+
+    private ArrayList<String> notificationsKeyList = new ArrayList<>(); //Every notification in the database has a key. Thislist will hold the keys
+    private ArrayList<String> arrayList = new ArrayList<>();            //in elements parallel to the arraylist of notifications(wish it was 2d array)
     private ArrayAdapter<String> adapter; //the adapter between the database and listView
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -86,6 +95,7 @@ public class NotificationsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notifications);
 
+        myContext = this;
         //Below is some necessary code for the google sign-in/off
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -99,7 +109,36 @@ public class NotificationsActivity extends AppCompatActivity {
         dbReference = FirebaseDatabase.getInstance().getReference("notifications");//Get a reference to the 'notifications' part of the database
         userImagesRef = FirebaseStorage.getInstance().getReference(); //Get a storage reference to storage: child must be format user/camera/photo
                                                                         // unlike the database reference which uses multiple children
-        adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,arrayList);
+
+        adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,arrayList){// in here I link the array list to the adapter
+            @NonNull
+            @Override                                                                                   //and also implement querying for "seen" field
+            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) { //to change color of text
+                View view = super.getView(position, convertView, parent);
+
+                final TextView tv = (TextView) view.findViewById(android.R.id.text1);
+
+                dbReference.child(notificationsKeyList.get(position)).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.child("seen").getValue(String.class).equals("No")){
+                            tv.setTextColor(Color.RED);
+                        }
+                        else{
+                            tv.setTextColor(Color.GREEN);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                }); //TODO: database restructure here
+
+                return view;
+            }
+        };
+
         notificationsList = (ListView)findViewById(R.id.notificationsListView); //initialize the listView object
         notificationsList.setAdapter(adapter);
         registerForContextMenu(notificationsList);
@@ -111,7 +150,11 @@ public class NotificationsActivity extends AppCompatActivity {
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
                 //makeToast(adapterView.getItemAtPosition(i).toString());
                 selectedItemIndex = i;
-                return false;
+                String wholeItemString = adapterView.getItemAtPosition(i).toString();
+                String[] selectedParts = wholeItemString.split("\n");
+                selectedItemCamera = selectedParts[0].substring(selectedParts[0].indexOf(":")+2,selectedParts[0].length());//format is "camera: ***" So start
+                selectedItemDateTime = selectedParts[1].substring(selectedParts[1].indexOf(":")+2,selectedParts[1].length());//substring two elements after
+                return false;                                                                                               //colon to go over the space
             }
         });
 
@@ -171,6 +214,7 @@ public class NotificationsActivity extends AppCompatActivity {
                 }
             }
 
+
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
@@ -204,7 +248,23 @@ public class NotificationsActivity extends AppCompatActivity {
     public boolean onContextItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.snapshot_option:
-                makeToast("TODO: launch imageViewingActivity intent"); //TODO
+
+                userImagesRef.child(user.getUid()+"/"+selectedItemCamera+"/"+selectedItemDateTime).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Intent intent = new Intent(myContext, ViewImageActivity.class);
+                        intent.putExtra("IMAGE_URL",uri.toString());
+                        intent.putExtra("USER_ID",user.getUid()); //TODO Use this if we restructure the database
+                        intent.putExtra("NOTIFICATION_KEY",notificationsKeyList.get(selectedItemIndex));
+                        startActivity(intent);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        makeToast("Error getting reference to image!");
+                    }
+                });
+
                 return true;
             case R.id.delete_option:            //TODO : if i restructure the database, add the extra child here
                 dbReference.child(notificationsKeyList.get(selectedItemIndex)).removeValue();//This removes the notification from the database
