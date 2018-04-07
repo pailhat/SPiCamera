@@ -34,4 +34,7 @@
     <string name="title_activity_view_image">ViewImageActivity</string>
     <string name="dummy_button">Download</string>
     <string name="dummy_content">LOADING\nIMAGE</string>
+
+    <string name ="contextMenu_snapshot">View snapshot</string>
+    <string name ="contextMenu_delete">Delete notification(and also snapshot)</string>
 </resources>

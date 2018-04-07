@@ -116,6 +116,7 @@ public class ImageActivity extends AppCompatActivity implements
                 R.layout.list_item, rowItems);
         listView.setAdapter(adapter);
 
+
         //The block below handles changes in the database, and manages the array list used for the list view
         dbReference.addChildEventListener(new ChildEventListener() {
             @Override

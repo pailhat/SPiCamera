@@ -10,8 +10,14 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -20,6 +26,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -29,6 +37,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
 
 public class NotificationsActivity extends AppCompatActivity {
@@ -40,7 +50,10 @@ public class NotificationsActivity extends AppCompatActivity {
     private TextView mTextMessage;
     private ListView notificationsList;
     private DatabaseReference dbReference;
+    private StorageReference userImagesRef;
 
+    private int selectedItemIndex;
+    private ArrayList<String> notificationsKeyList = new ArrayList<>();
     private ArrayList<String> arrayList = new ArrayList<>();
     private ArrayAdapter<String> adapter; //the adapter between the database and listView
 
@@ -84,11 +97,23 @@ public class NotificationsActivity extends AppCompatActivity {
         user = mAuth.getCurrentUser();
 
         dbReference = FirebaseDatabase.getInstance().getReference("notifications");//Get a reference to the 'notifications' part of the database
-        //dbReference.orderByChild("receiver").equalTo(user.getUid());
-
+        userImagesRef = FirebaseStorage.getInstance().getReference(); //Get a storage reference to storage: child must be format user/camera/photo
+                                                                        // unlike the database reference which uses multiple children
         adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,arrayList);
         notificationsList = (ListView)findViewById(R.id.notificationsListView); //initialize the listView object
         notificationsList.setAdapter(adapter);
+        registerForContextMenu(notificationsList);
+
+        //TODO make normal on item click listener
+
+        notificationsList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() { //this is the response to a long click to any notification in the listView
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                //makeToast(adapterView.getItemAtPosition(i).toString());
+                selectedItemIndex = i;
+                return false;
+            }
+        });
 
         //The block below handles changes in the database, and manages the array list used for the list view
         dbReference.addChildEventListener(new ChildEventListener() {
@@ -99,6 +124,7 @@ public class NotificationsActivity extends AppCompatActivity {
                     String dateString = "When: " + dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
 
                     arrayList.add(cameraString + "\n" + dateString );
+                    notificationsKeyList.add(dataSnapshot.getKey());
                     adapter.notifyDataSetChanged();
 
                     //makeToast(notificationsList.getChildCount()+"");
@@ -118,14 +144,30 @@ public class NotificationsActivity extends AppCompatActivity {
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 if(user.getUid().equals(dataSnapshot.child("receiver").getValue(String.class)) && dataSnapshot.child("mode").getValue(String.class).equals("auto")) {
-                    String cameraString = "Camera ID: " + dataSnapshot.child("camera").getValue(String.class);
-                    String dateString = "When: " + dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
+                    final String cameraString = "Camera ID: " + dataSnapshot.child("camera").getValue(String.class);
+                    final String dateString = "When: " + dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
                     String wholeString = cameraString + "\n" + dateString;
-                    if(arrayList.remove(wholeString)){
-                        arrayList.remove(wholeString);
-                        makeToast("Lost from database: " + wholeString);
+                    if(arrayList.remove(wholeString) && notificationsKeyList.remove(dataSnapshot.getKey())){
+                        makeToast("Lost from local lists: " + wholeString);
+
+                        String imageDirectory = user.getUid()+"/"+dataSnapshot.child("camera").getValue(String.class)
+                                +"/"+dataSnapshot.child("date").getValue(String.class);
+
+                        userImagesRef.child(imageDirectory).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                makeToast("Successfully removed on Storage");
+                                adapter.notifyDataSetChanged(); //finally notify adapter that everything is safe, so adjust the listView
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                makeToast("Removal failed: "+cameraString+"/"+dateString);
+                            }
+                        });
+                        adapter.notifyDataSetChanged();
                     }
-                    adapter.notifyDataSetChanged();
+
                 }
             }
 
@@ -138,7 +180,9 @@ public class NotificationsActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
+        }); //If any changes to the database happen, the code in here is the response
+
+
 
         //Below is the code to generate the navbar for this activity
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
@@ -149,6 +193,27 @@ public class NotificationsActivity extends AppCompatActivity {
 
     }
 
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) { //I had to use ctrl-O for some reason....
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getMenuInflater().inflate(R.menu.notification_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.snapshot_option:
+                makeToast("TODO: launch imageViewingActivity intent"); //TODO
+                return true;
+            case R.id.delete_option:            //TODO : if i restructure the database, add the extra child here
+                dbReference.child(notificationsKeyList.get(selectedItemIndex)).removeValue();//This removes the notification from the database
+                                                                                             //in theory the "onChildRemoved" for the database listener
+                return true;                                                                 //should delete the item from the adapter's arrayList
+            default:                                                                         //and from the array list of keys for each notification
+                return super.onContextItemSelected(item);
+        }
+    }
 
 
     //***Below are copy pasted functions from other activities:
