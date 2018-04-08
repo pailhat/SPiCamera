@@ -143,12 +143,39 @@ public class NotificationsActivity extends AppCompatActivity {
         notificationsList.setAdapter(adapter);
         registerForContextMenu(notificationsList);
 
-        //TODO make normal on item click listener
+
+        notificationsList.setOnItemClickListener(new OnItemClickListener() { //actions taken when there is a 'short' click on a notification
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                final int indexOfItem_InAllLists = i;
+                String wholeItemString = adapterView.getItemAtPosition(i).toString();
+                String[] selectedParts = wholeItemString.split("\n");
+                selectedItemCamera = selectedParts[0].substring(selectedParts[0].indexOf(":")+2,selectedParts[0].length());//format is "camera: ***" So start
+                selectedItemDateTime = selectedParts[1].substring(selectedParts[1].indexOf(":")+2,selectedParts[1].length());//substring two elements after
+                                                                                                                            //colon
+                userImagesRef.child(user.getUid()+"/"+selectedItemCamera+"/"+selectedItemDateTime).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Intent intent = new Intent(myContext, ViewImageActivity.class);
+                        intent.putExtra("IMAGE_URL",uri.toString());
+                        intent.putExtra("USER_ID",user.getUid()); //TODO Use this if we restructure the database
+                        intent.putExtra("NOTIFICATION_KEY",notificationsKeyList.get(indexOfItem_InAllLists));
+                        startActivity(intent);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        makeToast("Error getting reference to image!");
+                    }
+                });
+
+            }
+        });
 
         notificationsList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() { //this is the response to a long click to any notification in the listView
             @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                //makeToast(adapterView.getItemAtPosition(i).toString());
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) { //on long click, i save some variables to the private members
+                                                                                      //so that i can use them from inside the pop-up menu functions
                 selectedItemIndex = i;
                 String wholeItemString = adapterView.getItemAtPosition(i).toString();
                 String[] selectedParts = wholeItemString.split("\n");
@@ -161,19 +188,16 @@ public class NotificationsActivity extends AppCompatActivity {
         //The block below handles changes in the database, and manages the array list used for the list view
         dbReference.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {//actions taken when discovering things in the database
                 if(user.getUid().equals(dataSnapshot.child("receiver").getValue(String.class)) && dataSnapshot.child("mode").getValue(String.class).equals("auto")){
                     String cameraString = "Camera ID: " + dataSnapshot.child("camera").getValue(String.class);
                     String dateString = "When: " + dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
 
                     arrayList.add(cameraString + "\n" + dateString );
-                    notificationsKeyList.add(dataSnapshot.getKey());
+                    notificationsKeyList.add(dataSnapshot.getKey()); //key for item in array list is kept in parallel element
                     adapter.notifyDataSetChanged();
 
-                    //makeToast(notificationsList.getChildCount()+"");
-                    //adapter.getView(arrayList.size() -1,null,notificationsList).setBackgroundColor(getResources().getColor(R.color.notificationSeen));
 
-                    //notificationsList.getChildAt(arrayList.size()-1).setBackgroundColor(getResources().getColor(R.color.notificationSeen));
                 }
 
 
@@ -185,7 +209,7 @@ public class NotificationsActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
+            public void onChildRemoved(DataSnapshot dataSnapshot) { //actions taken when something in the database is removed
                 if(user.getUid().equals(dataSnapshot.child("receiver").getValue(String.class)) && dataSnapshot.child("mode").getValue(String.class).equals("auto")) {
                     final String cameraString = "Camera ID: " + dataSnapshot.child("camera").getValue(String.class);
                     final String dateString = "When: " + dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
@@ -238,14 +262,14 @@ public class NotificationsActivity extends AppCompatActivity {
     }
 
 
-    @Override
+    @Override// creation of pop-up menu
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) { //I had to use ctrl-O for some reason....
         super.onCreateContextMenu(menu, v, menuInfo);
         getMenuInflater().inflate(R.menu.notification_menu, menu);
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item) {
+    public boolean onContextItemSelected(MenuItem item) { //actions taken when an option is selected from the pop-up menu
         switch(item.getItemId()){
             case R.id.snapshot_option:
 
