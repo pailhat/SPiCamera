@@ -218,6 +218,7 @@ public class ImageActivity extends AppCompatActivity implements
         intent.putExtra("IMAGE_URL", rowItems.get(position).getImageUrl());
         intent.putExtra("USER_ID",user.getUid()); //TODO Use this if we restructure the database
         intent.putExtra("NOTIFICATION_KEY",notificationsKeyList.get(position));
+        intent.putExtra("FROM_ACT","Images");
         startActivity(intent);
 
 

@@ -1,5 +1,6 @@
 package com.example.student.spicamera;
 
+import android.content.Intent;
 import android.annotation.SuppressLint;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -181,5 +182,15 @@ public class ViewImageActivity extends AppCompatActivity {
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (((String)getIntent().getExtras().get("FROM_ACT")).equals("Notifications")){
+            startActivity(new Intent (this, NotificationsActivity.class));
+        }
+        else{
+            startActivity(new Intent (this, ImageActivity.class));
+        }
     }
 }

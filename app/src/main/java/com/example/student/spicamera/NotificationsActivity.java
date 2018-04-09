@@ -118,7 +118,7 @@ public class NotificationsActivity extends AppCompatActivity {
 
                 final TextView tv = (TextView) view.findViewById(android.R.id.text1);
 
-                dbReference.child(notificationsKeyList.get(position)).addValueEventListener(new ValueEventListener() {
+                dbReference.child(notificationsKeyList.get(position)).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (dataSnapshot.child("seen").getValue(String.class).equals("No")){
@@ -162,6 +162,7 @@ public class NotificationsActivity extends AppCompatActivity {
                         intent.putExtra("IMAGE_URL",uri.toString());
                         intent.putExtra("USER_ID",user.getUid()); //TODO Use this if we restructure the database
                         intent.putExtra("NOTIFICATION_KEY",notificationsKeyList.get(indexOfItem_InAllLists));
+                        intent.putExtra("FROM_ACT","Notifications");
                         startActivity(intent);
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -281,6 +282,7 @@ public class NotificationsActivity extends AppCompatActivity {
                         Intent intent = new Intent(myContext, ViewImageActivity.class);
                         intent.putExtra("IMAGE_URL",uri.toString());
                         intent.putExtra("USER_ID",user.getUid()); //TODO Use this if we restructure the database
+                        intent.putExtra("FROM_ACT","Notifications");
                         intent.putExtra("NOTIFICATION_KEY",notificationsKeyList.get(selectedItemIndex));
                         startActivity(intent);
                     }
