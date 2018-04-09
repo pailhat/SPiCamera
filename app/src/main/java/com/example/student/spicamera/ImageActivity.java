@@ -60,6 +60,8 @@ public class ImageActivity extends AppCompatActivity implements
     private GoogleSignInClient mGoogleSignInClient;
     private DatabaseReference dbReference;
     private CustomListViewAdapter adapter;
+    private ArrayList<String> notificationsKeyList = new ArrayList<>();
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -113,7 +115,7 @@ public class ImageActivity extends AppCompatActivity implements
 
         listView = (ListView) findViewById(R.id.imagesListView);
         adapter = new CustomListViewAdapter(context,
-                R.layout.list_item, rowItems);
+                R.layout.list_item, rowItems, dbReference, notificationsKeyList);
         listView.setAdapter(adapter);
 
 
@@ -131,7 +133,7 @@ public class ImageActivity extends AppCompatActivity implements
                         @Override
                         public void onSuccess(Uri uri) {
 
-                            makeToast(uri.toString());
+                            //makeToast(uri.toString());
                             RowItem item = new RowItem(uri.toString(), dateString, cameraString, dateString);
                             rowItems.add(item);
 
@@ -141,6 +143,7 @@ public class ImageActivity extends AppCompatActivity implements
                         public void onComplete(@NonNull Task<Uri> task) {
 
                             adapter.notifyDataSetChanged();
+                            notificationsKeyList.add(dataSnapshot.getKey());
 
                         }
                     });
@@ -206,6 +209,8 @@ public class ImageActivity extends AppCompatActivity implements
         toast.show();
         Intent intent = new Intent(this, ViewImageActivity.class);
         intent.putExtra("IMAGE_URL", rowItems.get(position).getImageUrl());
+        intent.putExtra("USER_ID",user.getUid()); //TODO Use this if we restructure the database
+        intent.putExtra("NOTIFICATION_KEY",notificationsKeyList.get(position));
         startActivity(intent);
 
 

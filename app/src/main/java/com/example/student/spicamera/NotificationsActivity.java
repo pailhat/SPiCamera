@@ -118,14 +118,16 @@ public class NotificationsActivity extends AppCompatActivity {
 
                 final TextView tv = (TextView) view.findViewById(android.R.id.text1);
 
-                dbReference.child(notificationsKeyList.get(position)).addListenerForSingleValueEvent(new ValueEventListener() {
+                dbReference.child(notificationsKeyList.get(position)).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (dataSnapshot.child("seen").getValue(String.class).equals("No")){
-                            tv.setTextColor(Color.RED);
+                            tv.setBackgroundColor(getResources().getColor(R.color.cardBackground));
+                            tv.setTextColor(Color.BLACK);
                         }
                         else{
-                            tv.setTextColor(Color.GREEN);
+                            tv.setBackgroundColor(0x00000000);
+                            tv.setTextColor(Color.WHITE);
                         }
                     }
 
@@ -330,7 +332,7 @@ public class NotificationsActivity extends AppCompatActivity {
         startActivity(intent);
     }
     private void goToNotifications(){
-        Intent intent = new Intent(this,NotificationsActivity.class); //TODO: make activity
+        Intent intent = new Intent(this,NotificationsActivity.class);
         startActivity(intent);
     }
     private void goToRegisterPage() {

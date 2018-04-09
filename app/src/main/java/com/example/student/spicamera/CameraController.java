@@ -40,30 +40,44 @@ public class CameraController {
     }
 
     public void takeSnap() throws Exception {
-        sendCharacter("s");
+        sendCharacter("3");
     }
 
     public void left()  throws Exception {
-        sendCharacter("l");
+        sendCharacter("2");
     }
 
     public void right()  throws Exception {
-        sendCharacter("r");
+        sendCharacter("1");
     }
 
     private void sendCharacter(String c) throws Exception {
-        try{
-            Socket soc = new Socket(this.ip,PORT);
+        final String input = c;
+        Thread thread = new Thread(new Runnable() {
 
-            DataOutputStream dout = new DataOutputStream(soc.getOutputStream());
-            dout.writeUTF(c + "\n");
-            dout.flush();
-            dout.close();
-            soc.close();
+            @Override
+            public void run() {
+                try  {
 
-        } catch(Exception e){
-            e.printStackTrace();
-        }
+
+                    BufferedReader toSend = new BufferedReader(new InputStreamReader(System.in));
+
+                    Socket clientSocket = new Socket(getIp(), PORT);
+
+                    DataOutputStream toPi = new DataOutputStream(clientSocket.getOutputStream());
+
+                    //input = toSend.readLine();
+
+                    toPi.writeBytes(input);
+
+                    clientSocket.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        thread.start();
 
     }
 
