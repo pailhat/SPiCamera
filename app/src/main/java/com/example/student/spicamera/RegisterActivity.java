@@ -334,4 +334,10 @@ public class RegisterActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.getMenu().getItem(1).setChecked(true);
+    }
 }

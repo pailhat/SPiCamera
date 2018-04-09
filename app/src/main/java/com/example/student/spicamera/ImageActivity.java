@@ -102,7 +102,7 @@ public class ImageActivity extends AppCompatActivity implements
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         user = mAuth.getCurrentUser();
 
-        dbReference = FirebaseDatabase.getInstance().getReference("notifications");//Get a reference to the 'notifications' part of the database
+        dbReference = FirebaseDatabase.getInstance().getReference("notifications").child(user.getUid());//Get a reference to the 'notifications' part of the database
 
         //Creates the list items with the images from the arrays above
         //here we jsut need to query firebase to get this information instead
@@ -191,6 +191,13 @@ public class ImageActivity extends AppCompatActivity implements
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.getMenu().getItem(0).setChecked(true);
     }
 
     private void makeToast(String text) {

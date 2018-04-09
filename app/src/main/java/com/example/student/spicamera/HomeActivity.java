@@ -88,6 +88,13 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.getMenu().getItem(0).setChecked(true);
+    }
+
     private void setUpCameras() {
         //Set background colors and onclick for each card
         //1. Query for user object

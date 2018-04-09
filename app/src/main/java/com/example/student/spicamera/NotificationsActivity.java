@@ -106,7 +106,7 @@ public class NotificationsActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         user = mAuth.getCurrentUser();
 
-        dbReference = FirebaseDatabase.getInstance().getReference("notifications");//Get a reference to the 'notifications' part of the database
+        dbReference = FirebaseDatabase.getInstance().getReference("notifications").child(user.getUid());//Get a reference to the 'notifications' part of the database
         userImagesRef = FirebaseStorage.getInstance().getReference(); //Get a storage reference to storage: child must be format user/camera/photo
                                                                         // unlike the database reference which uses multiple children
 
@@ -338,5 +338,12 @@ public class NotificationsActivity extends AppCompatActivity {
     private void goToRegisterPage() {
         Intent intent = new Intent(this, RegisterActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.getMenu().getItem(2).setChecked(true);
     }
 }
