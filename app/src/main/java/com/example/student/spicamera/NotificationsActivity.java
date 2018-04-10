@@ -348,4 +348,10 @@ public class NotificationsActivity extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.getMenu().getItem(2).setChecked(true);
     }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent (this, HomeActivity.class));
+        finish();
+    }
 }

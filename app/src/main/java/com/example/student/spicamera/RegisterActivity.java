@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -78,7 +79,28 @@ public class RegisterActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         user = mAuth.getCurrentUser();
 
-        //[END GOOGLE]
+        radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final DatabaseReference myRefUser = database.getReference("users");
+        myRefUser.child(user.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(int i = 0; i < 4;i++){
+
+                    RadioButton tempButton = (RadioButton)radioGroup.getChildAt(i);
+                    String camNum = Integer.toString(i+1);
+                    String newInfo = "Camera " + camNum +": "+dataSnapshot.child("camera"+camNum).getValue(String.class);
+                    tempButton.setText(newInfo);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
 
         mTextMessage = (TextView) findViewById(R.id.cameraId);
 
@@ -88,7 +110,6 @@ public class RegisterActivity extends AppCompatActivity {
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
 
         Button submitButton = (Button) findViewById(R.id.submit_register);
         submitButton.setOnClickListener(new View.OnClickListener() {

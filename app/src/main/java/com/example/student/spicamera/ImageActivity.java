@@ -76,13 +76,13 @@ public class ImageActivity extends AppCompatActivity implements
                     return true;
                 case R.id.navigation_notifications:
                     goToNotifications();
-        return true;
-        case R.id.navigation_signout:
-        signOut();
-        return true;
-    }
+                    return true;
+                case R.id.navigation_signout:
+                    signOut();
+                    return true;
+            }
             return false;
-}
+        }
     };
 
     /** Called when the activity is first created. */
@@ -186,7 +186,7 @@ public class ImageActivity extends AppCompatActivity implements
 
         //Below is the code to generate the navbar for this activity
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.getMenu().getItem(2).setChecked(true);
+        navigation.getMenu().getItem(0).setChecked(true);
         Log.w("BottomNav", navigation.getSelectedItemId() + "");
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);

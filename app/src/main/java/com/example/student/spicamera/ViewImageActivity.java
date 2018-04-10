@@ -188,9 +188,10 @@ public class ViewImageActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (((String)getIntent().getExtras().get("FROM_ACT")).equals("Notifications")){
             startActivity(new Intent (this, NotificationsActivity.class));
+            finish();
         }
         else{
-            startActivity(new Intent (this, ImageActivity.class));
+            super.onBackPressed();
         }
     }
 }
