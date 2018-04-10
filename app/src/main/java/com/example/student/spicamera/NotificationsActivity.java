@@ -218,9 +218,9 @@ public class NotificationsActivity extends AppCompatActivity {
                     final String dateString = "When: " + dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
                     String wholeString = cameraString + "\n" + dateString;
                     if(arrayList.remove(wholeString) && notificationsKeyList.remove(dataSnapshot.getKey())){
-                        makeToast("Lost from local lists: " + wholeString);
+                        //makeToast("Lost from local lists: " + wholeString);
 
-                        String imageDirectory = user.getUid()+"/"+dataSnapshot.child("camera").getValue(String.class)
+                        final String imageDirectory = user.getUid()+"/"+dataSnapshot.child("camera").getValue(String.class)
                                 +"/"+dataSnapshot.child("date").getValue(String.class);
 
                         userImagesRef.child(imageDirectory).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -232,10 +232,12 @@ public class NotificationsActivity extends AppCompatActivity {
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                makeToast("Removal failed: "+cameraString+"/"+dateString);
+                                //makeToast("Removal failed: "+cameraString+"/"+dateString);
+                                //makeToast(imageDirectory);
+                                adapter.notifyDataSetChanged();
                             }
                         });
-                        adapter.notifyDataSetChanged();
+
                     }
 
                 }

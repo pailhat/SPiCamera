@@ -75,16 +75,19 @@ public class CustomListViewAdapter extends ArrayAdapter<RowItem> {
         dbReference.child(notificationsKeyList.get(position)).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.child("seen").getValue(String.class).equals("No")){
-                    convertViewFinal.setBackgroundColor(context.getResources().getColor(R.color.cardBackground));
-                    desc.setTextColor(Color.BLACK);
-                    title.setTextColor(Color.BLACK);
+                if (dataSnapshot.exists()) {
+                    if (dataSnapshot.child("seen").getValue(String.class).equals("No")){
+                        convertViewFinal.setBackgroundColor(context.getResources().getColor(R.color.cardBackground));
+                        desc.setTextColor(Color.BLACK);
+                        title.setTextColor(Color.BLACK);
+                    }
+                    else{
+                        convertViewFinal.setBackgroundColor(0x00000000);
+                        desc.setTextColor(Color.WHITE);
+                        title.setTextColor(Color.WHITE);
+                    }
                 }
-                else{
-                    convertViewFinal.setBackgroundColor(0x00000000);
-                    desc.setTextColor(Color.WHITE);
-                    title.setTextColor(Color.WHITE);
-                }
+
             }
 
             @Override
