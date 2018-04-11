@@ -184,14 +184,4 @@ public class ViewImageActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
-    @Override
-    public void onBackPressed() {
-        if (((String)getIntent().getExtras().get("FROM_ACT")).equals("Notifications")){
-            startActivity(new Intent (this, NotificationsActivity.class));
-            finish();
-        }
-        else{
-            super.onBackPressed();
-        }
-    }
 }

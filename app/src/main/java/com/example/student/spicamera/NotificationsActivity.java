@@ -118,16 +118,17 @@ public class NotificationsActivity extends AppCompatActivity {
 
                 final TextView tv = (TextView) view.findViewById(android.R.id.text1);
 
-                dbReference.child(notificationsKeyList.get(position)).addListenerForSingleValueEvent(new ValueEventListener() {
+                dbReference.child(notificationsKeyList.get(position)).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.child("seen").getValue(String.class).equals("No")){
-                            tv.setBackgroundColor(getResources().getColor(R.color.cardBackground));
-                            tv.setTextColor(Color.BLACK);
-                        }
-                        else{
-                            tv.setBackgroundColor(0x00000000);
-                            tv.setTextColor(Color.WHITE);
+                        if (dataSnapshot.exists()) {
+                            if (dataSnapshot.child("seen").getValue(String.class).equals("No")) {
+                                tv.setBackgroundColor(getResources().getColor(R.color.cardBackground));
+                                tv.setTextColor(Color.BLACK);
+                            } else {
+                                tv.setBackgroundColor(0x00000000);
+                                tv.setTextColor(Color.WHITE);
+                            }
                         }
                     }
 
@@ -351,9 +352,4 @@ public class NotificationsActivity extends AppCompatActivity {
         navigation.getMenu().getItem(2).setChecked(true);
     }
 
-    @Override
-    public void onBackPressed() {
-        startActivity(new Intent (this, HomeActivity.class));
-        finish();
-    }
 }

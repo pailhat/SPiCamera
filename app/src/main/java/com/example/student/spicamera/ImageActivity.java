@@ -38,20 +38,7 @@ import com.google.firebase.storage.StorageReference;
 
 public class ImageActivity extends AppCompatActivity implements
         OnItemClickListener {
-
-    /*public static final String[] titles = new String[] { "Strawberry",
-            "Banana", "Orange", "Mixed" };
-
-    public static final String[] descriptions = new String[] {
-            "It is an aggregate accessory fruit",
-            "It is the largest herbaceous flowering plant", "Citrus Fruit",
-            "Mixed Fruits" };
-
-    public static final String[]images = { "https://firebasestorage.googleapis.com/v0/b/spi-camera.appspot.com/o/cAzM9WQkyt%2F2018-03-22%2019%3A39%3A54.473197?alt=media&token=0fa979fd-bb0f-40fd-99e9-00cbb7a7f2d2",
-            "https://firebasestorage.googleapis.com/v0/b/spi-camera.appspot.com/o/cAzM9WQkyt%2F2018-03-22%2019%3A44%3A35.043504?alt=media&token=02505b9f-0104-4d36-968c-e3bb5cce2da9",
-            "https://firebasestorage.googleapis.com/v0/b/spi-camera.appspot.com/o/cAzM9WQkyt%2F2018-03-22%2019%3A39%3A54.473197?alt=media&token=0fa979fd-bb0f-40fd-99e9-00cbb7a7f2d2",
-            "https://firebasestorage.googleapis.com/v0/b/spi-camera.appspot.com/o/cAzM9WQkyt%2F2018-03-22%2019%3A44%3A35.043504?alt=media&token=02505b9f-0104-4d36-968c-e3bb5cce2da9"};
-    */
+    
     ListView listView;
     List<RowItem> rowItems;
 
