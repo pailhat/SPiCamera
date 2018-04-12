@@ -2,8 +2,18 @@ package com.example.student.spicamera;
 
 import android.util.Log;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
@@ -39,5 +49,22 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
      */
     private void sendRegistrationToServer(String token) {
         // TODO: Implement this method to send token to your app server.
+        //Below is some necessary code for the google sign-in/off
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        FirebaseUser user = mAuth.getCurrentUser();
+
+        DatabaseReference dbReference = FirebaseDatabase.getInstance().getReference("users").child(user.getUid());
+
+        Map<String, Object> updatesUser = new HashMap<>();
+        updatesUser.put("deviceID", token);
+
+        dbReference.updateChildren(updatesUser);
+
     }
 }

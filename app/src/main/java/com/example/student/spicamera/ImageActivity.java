@@ -93,7 +93,7 @@ public class ImageActivity extends AppCompatActivity implements
 
         //Creates the list items with the images from the arrays above
         //here we jsut need to query firebase to get this information instead
-        //TODO Query firebase for all images associated with the camera
+
 
         final StorageReference myRef = FirebaseStorage.getInstance().getReference().child(user.getUid());
 
@@ -196,16 +196,16 @@ public class ImageActivity extends AppCompatActivity implements
     public void onItemClick(AdapterView<?> parent, View view, int position,
                             long id) {
 
-        /*TODO -In this onclick adapter, we edit it to open an activity showing a big picture of the image*/
+
         Toast toast = Toast.makeText(getApplicationContext(),
                 "Item " + (position + 1) + ": " + rowItems.get(position),
                 Toast.LENGTH_SHORT);
         toast.show();
         Intent intent = new Intent(this, ViewImageActivity.class);
         intent.putExtra("IMAGE_URL", rowItems.get(position).getImageUrl());
-        intent.putExtra("USER_ID",user.getUid()); //TODO Use this if we restructure the database
+        intent.putExtra("USER_ID",user.getUid());
         intent.putExtra("NOTIFICATION_KEY",notificationsKeyList.get(position));
-        intent.putExtra("FROM_ACT","Images");
+
         startActivity(intent);
 
 
@@ -235,7 +235,7 @@ public class ImageActivity extends AppCompatActivity implements
         startActivity(intent);
     }
     private void goToNotifications(){
-        Intent intent = new Intent(this,NotificationsActivity.class); //TODO: make activity
+        Intent intent = new Intent(this,NotificationsActivity.class);
         startActivity(intent);
     }
     private void goToRegisterPage() {
