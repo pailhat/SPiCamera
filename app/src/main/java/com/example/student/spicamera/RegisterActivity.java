@@ -54,7 +54,7 @@ public class RegisterActivity extends AppCompatActivity {
                     return true;
                 case R.id.navigation_register:
                     return true;
-                case R.id.navigation_notifications: //TODO: figure this out
+                case R.id.navigation_notifications:
                     goToNotifications();
                     return true;
                 case R.id.navigation_signout:
@@ -347,7 +347,7 @@ public class RegisterActivity extends AppCompatActivity {
         startActivity(intent);
     }
     private void goToNotifications(){
-        Intent intent = new Intent(this,NotificationsActivity.class); //TODO: make activity
+        Intent intent = new Intent(this,NotificationsActivity.class);
         startActivity(intent);
     }
     private void goToRegisterPage() {

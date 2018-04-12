@@ -116,7 +116,7 @@ public class ViewImageActivity extends AppCompatActivity {
 
         //Here, if the user came from the notificationActivity, then mark the notification as seen. Also Database and storage items will definitely exist if
         // we made it this far, so I don't think I need to check.
-        if(getIntent().hasExtra("NOTIFICATION_KEY")){ //TODO: Change this if database restructure, to also check for user_id extra
+        if(getIntent().hasExtra("NOTIFICATION_KEY")){ 
             dbReference = FirebaseDatabase.getInstance().getReference("notifications").child((String)getIntent().getExtras().get("USER_ID"));
             dbReference.child((String)getIntent().getExtras().get("NOTIFICATION_KEY")).child("seen").setValue("Yes"); //Here i mark notification as seen
         }

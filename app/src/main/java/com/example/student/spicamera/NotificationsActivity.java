@@ -136,7 +136,7 @@ public class NotificationsActivity extends AppCompatActivity {
                     public void onCancelled(DatabaseError databaseError) {
 
                     }
-                }); //TODO: database restructure here
+                });
 
                 return view;
             }
@@ -161,7 +161,7 @@ public class NotificationsActivity extends AppCompatActivity {
                     public void onSuccess(Uri uri) {
                         Intent intent = new Intent(myContext, ViewImageActivity.class);
                         intent.putExtra("IMAGE_URL",uri.toString());
-                        intent.putExtra("USER_ID",user.getUid()); //TODO Use this if we restructure the database
+                        intent.putExtra("USER_ID",user.getUid());
                         intent.putExtra("NOTIFICATION_KEY",notificationsKeyList.get(indexOfItem_InAllLists));
                         intent.putExtra("FROM_ACT","Notifications");
                         startActivity(intent);
@@ -208,7 +208,7 @@ public class NotificationsActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {//TODO: This is where i can implement the unseen notification system
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
             }
 
@@ -284,7 +284,7 @@ public class NotificationsActivity extends AppCompatActivity {
                     public void onSuccess(Uri uri) {
                         Intent intent = new Intent(myContext, ViewImageActivity.class);
                         intent.putExtra("IMAGE_URL",uri.toString());
-                        intent.putExtra("USER_ID",user.getUid()); //TODO Use this if we restructure the database
+                        intent.putExtra("USER_ID",user.getUid());
                         intent.putExtra("FROM_ACT","Notifications");
                         intent.putExtra("NOTIFICATION_KEY",notificationsKeyList.get(selectedItemIndex));
                         startActivity(intent);
@@ -297,7 +297,7 @@ public class NotificationsActivity extends AppCompatActivity {
                 });
 
                 return true;
-            case R.id.delete_option:            //TODO : if i restructure the database, add the extra child here
+            case R.id.delete_option:
                 dbReference.child(notificationsKeyList.get(selectedItemIndex)).removeValue();//This removes the notification from the database
                                                                                              //in theory the "onChildRemoved" for the database listener
                 return true;                                                                 //should delete the item from the adapter's arrayList
