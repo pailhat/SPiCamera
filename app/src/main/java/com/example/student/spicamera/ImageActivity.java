@@ -38,7 +38,7 @@ import com.google.firebase.storage.StorageReference;
 
 public class ImageActivity extends AppCompatActivity implements
         OnItemClickListener {
-    
+
     ListView listView;
     List<RowItem> rowItems;
 

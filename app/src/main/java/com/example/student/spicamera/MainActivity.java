@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.floatingActionButton);
+        Button floatingActionButton = (Button) findViewById(R.id.floatingActionButton);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 goToImages();
