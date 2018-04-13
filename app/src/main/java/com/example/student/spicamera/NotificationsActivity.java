@@ -121,7 +121,7 @@ public class NotificationsActivity extends AppCompatActivity {
                 dbReference.child(notificationsKeyList.get(position)).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
+                        if (dataSnapshot.exists() && dataSnapshot.child("mode").getValue(String.class).equals("auto")) {
                             if (dataSnapshot.child("seen").getValue(String.class).equals("No")) {
                                 tv.setBackgroundColor(getResources().getColor(R.color.cardBackground));
                                 tv.setTextColor(Color.BLACK);
@@ -163,7 +163,7 @@ public class NotificationsActivity extends AppCompatActivity {
                         intent.putExtra("IMAGE_URL",uri.toString());
                         intent.putExtra("USER_ID",user.getUid());
                         intent.putExtra("NOTIFICATION_KEY",notificationsKeyList.get(indexOfItem_InAllLists));
-                        intent.putExtra("FROM_ACT","Notifications");
+
                         startActivity(intent);
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -193,7 +193,7 @@ public class NotificationsActivity extends AppCompatActivity {
         dbReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {//actions taken when discovering things in the database
-                if(user.getUid().equals(dataSnapshot.child("receiver").getValue(String.class)) && dataSnapshot.child("mode").getValue(String.class).equals("auto")){
+                if(dataSnapshot.child("mode").getValue(String.class).equals("auto")){
                     String cameraString = "Camera ID: " + dataSnapshot.child("camera").getValue(String.class);
                     String dateString = "When: " + dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
 
@@ -214,7 +214,7 @@ public class NotificationsActivity extends AppCompatActivity {
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) { //actions taken when something in the database is removed
-                if(user.getUid().equals(dataSnapshot.child("receiver").getValue(String.class)) && dataSnapshot.child("mode").getValue(String.class).equals("auto")) {
+                if(dataSnapshot.child("mode").getValue(String.class).equals("auto")) {
                     final String cameraString = "Camera ID: " + dataSnapshot.child("camera").getValue(String.class);
                     final String dateString = "When: " + dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
                     String wholeString = cameraString + "\n" + dateString;

@@ -20,6 +20,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -37,6 +38,10 @@ public class HomeActivity extends AppCompatActivity {
     private FirebaseUser user;
     private GoogleSignInClient mGoogleSignInClient;
     private TextView mTextMessage;
+    private CardView[] allCards;
+    private FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private DatabaseReference myRefCamera = database.getReference("cameras");
+    private DatabaseReference myRefUser = database.getReference("users");
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -78,8 +83,6 @@ public class HomeActivity extends AppCompatActivity {
         //[END GOOGLE]
 
 
-
-
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navigation.getMenu().getItem(0).setChecked(true);
@@ -98,11 +101,9 @@ public class HomeActivity extends AppCompatActivity {
     private void setUpCameras() {
         //Set background colors and onclick for each card
         //1. Query for user object
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        final DatabaseReference myRefCamera = database.getReference("cameras");
-        final DatabaseReference myRefUser = database.getReference("users");
 
         final String userId = user.getUid();
+        allCards = new CardView[4];
 
         myRefUser.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -148,15 +149,17 @@ public class HomeActivity extends AppCompatActivity {
                         cvText.setTextSize(TypedValue.COMPLEX_UNIT_SP,25);
 
                         cvText.setText(cvText.getText()+": "+cameraIDExisting);
+
                         cv.setBackgroundColor(getResources().getColor(R.color.cardBackground));
+
                         cv.setOnClickListener(new View.OnClickListener() {
                             public void onClick(View v) {
                                 goToCamera(cameraID);
                             }
                         });
                     }
-
                 }
+
             }
 
             @Override

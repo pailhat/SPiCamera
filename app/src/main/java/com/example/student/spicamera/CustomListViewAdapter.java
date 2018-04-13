@@ -66,7 +66,7 @@ public class CustomListViewAdapter extends ArrayAdapter<RowItem> {
         holder.txtTitle.setText(rowItem.getTitle());
 
         String path = rowItem.getImageUrl();
-        Picasso.with(context).load(path).into(holder.imageView);
+        Picasso.with(context).load(path).fit().into(holder.imageView);
 
         final TextView desc = holder.txtDesc;
         final TextView title = holder.txtTitle;

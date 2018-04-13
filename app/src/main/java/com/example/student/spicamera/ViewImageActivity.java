@@ -106,6 +106,7 @@ public class ViewImageActivity extends AppCompatActivity {
         mContentView = findViewById(R.id.fullscreen_content);
 
 
+
         // Set up the user interaction to manually show or hide the system UI.
         mContentView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,7 +123,8 @@ public class ViewImageActivity extends AppCompatActivity {
         }
         //Get the imageurl with put/getExtra
         String imageUrl = (String) getIntent().getExtras().get("IMAGE_URL");
-        Picasso.with(this).load(imageUrl).into((ImageView) mContentView);
+        Picasso.with(this).load(imageUrl).fit().into((ImageView) mContentView);
+
 
 
         // Upon interacting with UI controls, delay any scheduled hide()
