@@ -111,8 +111,6 @@ public class HomeActivity extends AppCompatActivity {
                 final User userRetrieved = snapshot.getValue(User.class);
                 int cardId = 0;
                 int cardTextId=0;
-                CardView cv;
-                TextView cvText;
                 String cameraIDExisting = "";
 
                 //Get the camera id from what the user selected with the radio button list
@@ -143,8 +141,10 @@ public class HomeActivity extends AppCompatActivity {
                     final String cameraID = cameraIDExisting;
 
                     if (!cameraID.equals("")) {
-                        cv = (CardView) findViewById(cardId);
-                        cvText = (TextView) findViewById(cardTextId);
+
+                        final CardView cv = (CardView) findViewById(cardId);
+
+                        final TextView cvText = (TextView) findViewById(cardTextId);
 
                         cvText.setTextSize(TypedValue.COMPLEX_UNIT_SP,25);
 
@@ -157,6 +157,28 @@ public class HomeActivity extends AppCompatActivity {
                                 goToCamera(cameraID);
                             }
                         });
+
+                        //Changing the background color to light grey if the camera status is off
+                        myRefCamera.child(cameraID).child("cameraStatus").addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot snapshot) {
+                                if (snapshot.exists()) {
+
+                                    if (snapshot.getValue(String.class).equals("off")) {
+                                        cv.setBackgroundColor(getResources().getColor(R.color.cardBackgroundCamOff));
+
+                                    } else {
+                                        cv.setBackgroundColor(getResources().getColor(R.color.cardBackground));
+                                    }
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError arg0) {
+                            }
+                        });
+
                     }
                 }
 
