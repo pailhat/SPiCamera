@@ -222,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             super.onReceivedError(view, errorCode, description, failingUrl);
-            view.loadData("<html><center><BR><BR><BR><h1>Camera feed not available!</h1></center></html>", "", "");
+            view.loadData("<html><center><BR><BR><BR><div style='font-size: 75px'>Camera feed not available!</div></center></html>", "", "");
         }
     }
 }

@@ -19,6 +19,7 @@
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait"
+            android:label="@string/title_activity_main"
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".GoogleSignInActivity"
@@ -80,11 +81,15 @@
             android:label="@string/title_activity_home" />
         <activity
             android:name=".RegisterActivity"
-            android:label="@string/title_activity_register" />
+            android:label="@string/title_activity_register"
+            android:theme="@style/AppTheme"/>
+
         <activity
             android:name=".NotificationsActivity"
             android:label="@string/title_activity_notification" />
-        <activity android:name=".ImageActivity" />
+        <activity android:name=".ImageActivity"
+            android:label="@string/title_activity_images"/>
+
         <activity
             android:name=".ViewImageActivity"
 

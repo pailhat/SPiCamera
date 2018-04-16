@@ -16,6 +16,8 @@
     <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
 
     <string name="title_activity_home">Home</string>
+    <string name="title_activity_main">Camera Feed</string>
+    <string name="title_activity_images">Images</string>
     <string name="title_home">Home</string>
     <string name="title_register">Register Camera</string>
     <string name="title_signout">Sign Out</string>
