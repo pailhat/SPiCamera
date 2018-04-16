@@ -150,7 +150,7 @@ public class HomeActivity extends AppCompatActivity {
 
                         cvText.setText(cvText.getText()+": "+cameraIDExisting);
 
-                        cv.setBackgroundColor(getResources().getColor(R.color.cardBackground));
+                        //cv.setCardBackgroundColor(getResources().getColor(R.color.cardBackground));
 
                         cv.setOnClickListener(new View.OnClickListener() {
                             public void onClick(View v) {
@@ -165,10 +165,10 @@ public class HomeActivity extends AppCompatActivity {
                                 if (snapshot.exists()) {
 
                                     if (snapshot.getValue(String.class).equals("off")) {
-                                        cv.setBackgroundColor(getResources().getColor(R.color.cardBackgroundCamOff));
+                                        cv.setCardBackgroundColor(getResources().getColor(R.color.cardBackgroundCamOff));
 
                                     } else {
-                                        cv.setBackgroundColor(getResources().getColor(R.color.cardBackground));
+                                        cv.setCardBackgroundColor(getResources().getColor(R.color.cardBackground));
                                     }
                                 }
 

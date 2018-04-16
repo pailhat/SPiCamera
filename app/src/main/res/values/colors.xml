@@ -4,7 +4,7 @@
     <color name="colorPrimaryDark">#4f6830</color>
     <color name="colorAccent">#5e8f48</color>
     <color name="windowBackGround">#4b4b4b</color>
-    <color name="cardBackground">#b99191</color>
+    <color name="cardBackground">#5c9b70</color>
     <color name="notificationSeen">#ce3c3c</color>
     <color name="cardBackgroundInactive">#787373</color>
     <color name="cardBackgroundCamOff">#bababa</color>
