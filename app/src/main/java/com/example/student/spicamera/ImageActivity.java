@@ -105,12 +105,13 @@ public class ImageActivity extends AppCompatActivity implements
                 R.layout.list_item, rowItems, dbReference, notificationsKeyList);
         listView.setAdapter(adapter);
 
+        final String cameraID = (String) getIntent().getExtras().get("CAMERA_ID");
 
         //The block below handles changes in the database, and manages the array list used for the list view
         dbReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
-                if (user.getUid().equals(dataSnapshot.child("receiver").getValue(String.class))) {
+                if (cameraID.equals(dataSnapshot.child("camera").getValue(String.class))) {
                     final String cameraString = dataSnapshot.child("camera").getValue(String.class);
                     final String dateString = dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
 

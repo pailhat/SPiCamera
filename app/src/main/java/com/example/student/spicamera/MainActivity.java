@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
         Button floatingActionButton = (Button) findViewById(R.id.floatingActionButton);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                goToImages();
+                goToImages(cameraID);
             }
         });
 
@@ -200,8 +200,9 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void goToImages() {
+    private void goToImages(String cameraID) {
         Intent intent = new Intent(this, ImageActivity.class);
+        intent.putExtra("CAMERA_ID",cameraID);
         startActivity(intent);
     }
 
