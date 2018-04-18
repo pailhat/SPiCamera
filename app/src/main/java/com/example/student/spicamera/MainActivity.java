@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference myRefCamera = database.getReference("cameras").child(cameraID);
-
+        final Context context = this;
         //Query for camera
         myRefCamera.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
 
                 //makeToast(url);
                 loadCameraFeed(url);
-                cameraController = new CameraController(url);
+                cameraController = new CameraController(url,context,myRefCamera);
                 setUpCameraButtons();
                 makeToast(cameraController.getIp());
 
