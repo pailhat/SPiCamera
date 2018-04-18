@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
@@ -35,6 +36,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
     // [START declare_auth]
@@ -269,15 +273,50 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void disableButtons() {
+        Button leftButton = (Button) findViewById(R.id.buttonLeft);
+        leftButton.setEnabled(false);
+
+        Button rightButton = (Button) findViewById(R.id.buttonRight);
+        rightButton.setEnabled(false);
+
+        Button snapButton = (Button) findViewById(R.id.buttonSnapShot);
+        snapButton.setEnabled(false);
+    }
+
+    private void enableButtons() {
+        Button leftButton = (Button) findViewById(R.id.buttonLeft);
+        Button rightButton = (Button) findViewById(R.id.buttonRight);
+        Button snapButton = (Button) findViewById(R.id.buttonSnapShot);
+
+        leftButton.setEnabled(true);
+        rightButton.setEnabled(true);
+        snapButton.setEnabled(true);
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
         unregisterReceiver(receiver);
+
+        disableButtons();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         registerReceiver(receiver, intentFilter);
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //Do something after 100ms
+                enableButtons();
+            }
+        }, 2000);
+
+
+
     }
 }

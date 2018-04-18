@@ -36,6 +36,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:enabled="false"
                 android:id="@+id/buttonLeft"
                 android:text="Left" />
 
@@ -43,6 +44,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:enabled="false"
                 android:id="@+id/buttonSnapShot"
                 android:text="Snapshot" />
 
@@ -50,6 +52,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:enabled="false"
                 android:id="@+id/buttonRight"
                 android:text="Right" />
         </LinearLayout>
