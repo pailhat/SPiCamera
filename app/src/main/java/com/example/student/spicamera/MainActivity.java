@@ -1,7 +1,13 @@
 package com.example.student.spicamera;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
@@ -42,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference myRefCamera;
     private EditText urlText;
     private CameraController cameraController;
+    private MyBroadcastReceiver receiver;
+    private IntentFilter intentFilter;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -119,6 +127,11 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
+
+        //Change bell icon when notificaiton is received
+        intentFilter = new IntentFilter();
+        intentFilter.addAction("com.my.app.onMessageReceived");
+        receiver = new MyBroadcastReceiver();
     }
 
     private void loadCameraFeed(String url) {
@@ -225,5 +238,46 @@ public class MainActivity extends AppCompatActivity {
             super.onReceivedError(view, errorCode, description, failingUrl);
             view.loadData("<html><center><BR><BR><BR><div style='font-size: 75px'>Camera feed not available!</div></center></html>", "", "");
         }
+    }
+
+    private class MyBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle extras = intent.getExtras();
+            String state = extras.getString("NOTIFICATION");
+
+            //Update my view
+            if (state.equals("1")) {
+
+                BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+                navigation.getMenu().getItem(2).setIcon(getResources().getDrawable(R.drawable.ic_notifications_active_black_24dp));
+
+                makeToast("Movement detected.");
+
+                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                // Vibrate for 500 milliseconds
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    v.vibrate(VibrationEffect.createOneShot(500,VibrationEffect.DEFAULT_AMPLITUDE));
+                }else{
+                    //deprecated in API 26
+                    v.vibrate(500);
+                }
+                //navigation.getMenu().getItem(2).getIcon().setColorFilter(getResources().getColor(R.color.colorNotification), PorterDuff.Mode.);
+            }
+
+        }
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(receiver);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(receiver, intentFilter);
     }
 }

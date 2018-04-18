@@ -1,9 +1,14 @@
 package com.example.student.spicamera;
 
 import android.app.LauncherActivity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.graphics.Color;
+import android.os.Build;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -61,6 +66,8 @@ public class NotificationsActivity extends AppCompatActivity {
     private String selectedItemDateTime; //Technically the name of the file in the selected notification
     private Context myContext;             //Context saved soon after onCreate, so that i can use it from inside listeners to launch new activities
 
+    private MyBroadcastReceiver receiver;
+    private IntentFilter intentFilter;
 
     private ArrayList<String> notificationsKeyList = new ArrayList<>(); //Every notification in the database has a key. Thislist will hold the keys
     private ArrayList<String> arrayList = new ArrayList<>();            //in elements parallel to the arraylist of notifications(wish it was 2d array)
@@ -261,10 +268,14 @@ public class NotificationsActivity extends AppCompatActivity {
         //Below is the code to generate the navbar for this activity
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.getMenu().getItem(2).setChecked(true);
-        Log.w("BottomNav", navigation.getSelectedItemId() + "");
+        navigation.getMenu().getItem(2).setIcon(getResources().getDrawable(R.drawable.ic_notifications_black_24dp));
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
+        //Change bell icon when notificaiton is received
+        intentFilter = new IntentFilter();
+        intentFilter.addAction("com.my.app.onMessageReceived");
+        receiver = new MyBroadcastReceiver();
     }
 
 
@@ -352,4 +363,42 @@ public class NotificationsActivity extends AppCompatActivity {
         navigation.getMenu().getItem(2).setChecked(true);
     }
 
+
+    private class MyBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle extras = intent.getExtras();
+            String state = extras.getString("NOTIFICATION");
+
+            //Update my view
+            if (state.equals("1")) {
+
+                makeToast("Movement detected.");
+
+                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                // Vibrate for 500 milliseconds
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    v.vibrate(VibrationEffect.createOneShot(500,VibrationEffect.DEFAULT_AMPLITUDE));
+                }else{
+                    //deprecated in API 26
+                    v.vibrate(500);
+                }
+                //navigation.getMenu().getItem(2).getIcon().setColorFilter(getResources().getColor(R.color.colorNotification), PorterDuff.Mode.);
+            }
+
+        }
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(receiver);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(receiver, intentFilter);
+    }
 }

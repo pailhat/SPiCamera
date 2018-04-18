@@ -1,8 +1,13 @@
 package com.example.student.spicamera;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
+import android.os.Build;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
@@ -48,6 +53,9 @@ public class ImageActivity extends AppCompatActivity implements
     private DatabaseReference dbReference;
     private CustomListViewAdapter adapter;
     private ArrayList<String> notificationsKeyList = new ArrayList<>();
+
+    private MyBroadcastReceiver receiver;
+    private IntentFilter intentFilter;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -179,6 +187,10 @@ public class ImageActivity extends AppCompatActivity implements
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
+        //Change bell icon when notificaiton is received
+        intentFilter = new IntentFilter();
+        intentFilter.addAction("com.my.app.onMessageReceived");
+        receiver = new MyBroadcastReceiver();
     }
 
     @Override
@@ -243,4 +255,46 @@ public class ImageActivity extends AppCompatActivity implements
         Intent intent = new Intent(this, RegisterActivity.class);
         startActivity(intent);
     }
+
+    private class MyBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle extras = intent.getExtras();
+            String state = extras.getString("NOTIFICATION");
+
+            //Update my view
+            if (state.equals("1")) {
+
+                BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+                navigation.getMenu().getItem(2).setIcon(getResources().getDrawable(R.drawable.ic_notifications_active_black_24dp));
+
+                makeToast("Movement detected.");
+
+                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                // Vibrate for 500 milliseconds
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    v.vibrate(VibrationEffect.createOneShot(500,VibrationEffect.DEFAULT_AMPLITUDE));
+                }else{
+                    //deprecated in API 26
+                    v.vibrate(500);
+                }
+                //navigation.getMenu().getItem(2).getIcon().setColorFilter(getResources().getColor(R.color.colorNotification), PorterDuff.Mode.);
+            }
+
+        }
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(receiver);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(receiver, intentFilter);
+    }
+
 }
