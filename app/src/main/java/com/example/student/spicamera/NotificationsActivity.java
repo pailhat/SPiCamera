@@ -204,8 +204,8 @@ public class NotificationsActivity extends AppCompatActivity {
                     String cameraString = "Camera ID: " + dataSnapshot.child("camera").getValue(String.class);
                     String dateString = "When: " + dataSnapshot.child("date").getValue(String.class); //is also the name of the picture
 
-                    arrayList.add(cameraString + "\n" + dateString );
-                    notificationsKeyList.add(dataSnapshot.getKey()); //key for item in array list is kept in parallel element
+                    arrayList.add(0,cameraString + "\n" + dateString );
+                    notificationsKeyList.add(0,dataSnapshot.getKey()); //key for item in array list is kept in parallel element
                     adapter.notifyDataSetChanged();
 
 

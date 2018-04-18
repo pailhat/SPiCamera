@@ -131,7 +131,7 @@ public class ImageActivity extends AppCompatActivity implements
 
                             //makeToast(uri.toString());
                             RowItem item = new RowItem(uri.toString(), dateString, cameraString, dateString);
-                            rowItems.add(item);
+                            rowItems.add(0,item);
 
                         }
                     }).addOnCompleteListener(new OnCompleteListener<Uri>() {
@@ -139,7 +139,7 @@ public class ImageActivity extends AppCompatActivity implements
                         public void onComplete(@NonNull Task<Uri> task) {
 
                             adapter.notifyDataSetChanged();
-                            notificationsKeyList.add(dataSnapshot.getKey());
+                            notificationsKeyList.add(0,dataSnapshot.getKey());
 
                         }
                     });
