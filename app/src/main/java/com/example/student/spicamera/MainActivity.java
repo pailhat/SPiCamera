@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.ColorStateList;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
     private WebView wv1;
     private String url = "";
+    private String cameraID;
     private DatabaseReference myRefCamera;
     private EditText urlText;
     private CameraController cameraController;
@@ -95,10 +97,10 @@ public class MainActivity extends AppCompatActivity {
 
 
         //Get the camera ID and set the webview
-        final String cameraID = (String) getIntent().getExtras().get("CAMERA_ID");
+        cameraID = (String) getIntent().getExtras().get("CAMERA_ID");
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        final DatabaseReference myRefCamera = database.getReference("cameras").child(cameraID);
+        myRefCamera = database.getReference("cameras").child(cameraID);
         final Context context = this;
         //Query for camera
         myRefCamera.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -112,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                 loadCameraFeed(url);
                 cameraController = new CameraController(url,context,myRefCamera);
                 setUpCameraButtons();
-                makeToast(cameraController.getIp());
+                //makeToast(cameraController.getIp());
 
             }
             @Override
@@ -127,6 +129,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        FloatingActionButton powerButton = (FloatingActionButton) findViewById(R.id.powerButton);
+        powerButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                cameraOnOff();
+            }
+        });
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -141,7 +149,6 @@ public class MainActivity extends AppCompatActivity {
     private void loadCameraFeed(String url) {
         wv1=(WebView)findViewById(R.id.webView);
         wv1.setWebViewClient(new MyBrowser());
-
         wv1.setInitialScale(1);
         wv1.getSettings().setLoadsImagesAutomatically(true);
         wv1.getSettings().setLoadWithOverviewMode(true);
@@ -240,7 +247,18 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             super.onReceivedError(view, errorCode, description, failingUrl);
-            view.loadData("<html><center><BR><BR><BR><div style='font-size: 75px'>Camera feed not available!</div></center></html>", "", "");
+            view.loadData("<html><center><BR><BR><BR><div style='font-size: 70px'>Camera feed not available</div></center></html>", "", "");
+
+            //On error, attempt to reload the camera feed in 10 seconds
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    //Do something after 100ms
+                    loadCameraFeed(url);
+                    //makeToast("trying again");
+                }
+            }, 7000);
         }
     }
 
@@ -288,10 +306,12 @@ public class MainActivity extends AppCompatActivity {
         Button leftButton = (Button) findViewById(R.id.buttonLeft);
         Button rightButton = (Button) findViewById(R.id.buttonRight);
         Button snapButton = (Button) findViewById(R.id.buttonSnapShot);
+        FloatingActionButton powerButton = (FloatingActionButton) findViewById(R.id.powerButton);
 
         leftButton.setEnabled(true);
         rightButton.setEnabled(true);
         snapButton.setEnabled(true);
+        powerButton.setEnabled(true);
     }
 
     @Override
@@ -302,19 +322,92 @@ public class MainActivity extends AppCompatActivity {
         disableButtons();
     }
 
+    private void cameraOnOff() {
+        DatabaseReference camStatusRef = myRefCamera.child("cameraStatus");
+        final FloatingActionButton powerButton = (FloatingActionButton) findViewById(R.id.powerButton);
+        //Query for camera
+        camStatusRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                String status = snapshot.getValue(String.class);
+                String statusToUpload = "on";
+                if (status.equals("on")) {
+                    statusToUpload = "off";
+                }
+                //makeToast("l");
+                Map<String, Object> updatesCamera = new HashMap<>();
+                updatesCamera.put("cameraStatus", statusToUpload);
+                myRefCamera.updateChildren(updatesCamera);
+
+                //Update UI
+                if (statusToUpload.equals("on")) {
+                    powerButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.cameraOff)));
+                    powerButton.setImageResource(R.drawable.ic_videocam_off_black_24dp);
+                    powerButton.setEnabled(false);
+
+                    makeToast("Turing on the camera...");
+
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            //Do something after 100ms
+                            enableButtons();
+                        }
+                    }, 3500);
+                } else {
+                    powerButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.cameraOn)));
+                    powerButton.setImageResource(R.drawable.ic_videocam_black_24dp);
+                    disableButtons();
+                    makeToast("Camera off.");
+                }
+
+            }
+            @Override
+            public void onCancelled(DatabaseError arg0) {
+            }
+        });
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         registerReceiver(receiver, intentFilter);
 
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
+        DatabaseReference camStatusRef = myRefCamera.child("cameraStatus");
+        final FloatingActionButton powerButton = (FloatingActionButton) findViewById(R.id.powerButton);
+        //Query for camera
+        camStatusRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void run() {
-                //Do something after 100ms
-                enableButtons();
+            public void onDataChange(DataSnapshot snapshot) {
+                String status = snapshot.getValue(String.class);
+;
+                //Update UI
+                if (status.equals("on")) {
+                    powerButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.cameraOff)));
+                    powerButton.setImageResource(R.drawable.ic_videocam_off_black_24dp);
+
+                    //Enable the buttons after 2 seconds
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            //Do something after 100ms
+                            enableButtons();
+                        }
+                    }, 2000);
+
+                } else {
+                    powerButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.cameraOn)));
+                    powerButton.setImageResource(R.drawable.ic_videocam_black_24dp);
+                    disableButtons();
+                }
+
             }
-        }, 2000);
+            @Override
+            public void onCancelled(DatabaseError arg0) {
+            }
+        });
 
 
 

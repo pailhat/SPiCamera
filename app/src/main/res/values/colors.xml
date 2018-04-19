@@ -10,4 +10,6 @@
     <color name="cardBackgroundCamOff">#bababa</color>
     <color name="black_overlay">#66000000</color>
     <color name="colorNotification">#fa205d</color>
+    <color name="cameraOff">#bc0e11</color>
+    <color name="cameraOn">#51ab73</color>
 </resources>
