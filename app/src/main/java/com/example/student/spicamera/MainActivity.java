@@ -14,7 +14,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
@@ -29,17 +28,16 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
     // [START declare_auth]
@@ -51,11 +49,16 @@ public class MainActivity extends AppCompatActivity {
     private WebView wv1;
     private String url = "";
     private String cameraID;
+    private DatabaseReference notificationsRef;
     private DatabaseReference myRefCamera;
     private EditText urlText;
     private CameraController cameraController;
     private MyBroadcastReceiver receiver;
     private IntentFilter intentFilter;
+
+    private ValueEventListener vanguardListenerHandle; //handle for the listener which prompts the other one to work
+    private ChildEventListener snapshotListenerHandle; //listener that begins checking for latest added children, after go ahead from vanguard
+    private boolean beginListening;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -99,8 +102,9 @@ public class MainActivity extends AppCompatActivity {
         //Get the camera ID and set the webview
         cameraID = (String) getIntent().getExtras().get("CAMERA_ID");
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
         myRefCamera = database.getReference("cameras").child(cameraID);
+        notificationsRef = database.getReference("notifications").child(mAuth.getCurrentUser().getUid());
         final Context context = this;
         //Query for camera
         myRefCamera.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -138,6 +142,52 @@ public class MainActivity extends AppCompatActivity {
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        //listener used to see if manual snapshot was successfull;
+
+        beginListening = false; //this is for the purpose of ignoring the initial "last" notification read
+
+        notificationsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                //makeToast(String.valueOf(dataSnapshot.hasChild("-L9vIQnnXnRuiUWw1krA")));
+                beginListening = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        snapshotListenerHandle = notificationsRef.limitToLast(1).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if(beginListening && dataSnapshot.child("camera").getValue(String.class).equals(cameraID)&& dataSnapshot.child("mode").getValue(String.class).equals("manual")){
+                    makeToast("Snapshot taken!");
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
 
         //Change bell icon when notificaiton is received
@@ -202,6 +252,7 @@ public class MainActivity extends AppCompatActivity {
     private void goHome() {
         Intent intent = new Intent(this, HomeActivity.class);
         startActivity(intent);
+
     }
 
     private void signOut() {
@@ -222,17 +273,20 @@ public class MainActivity extends AppCompatActivity {
     private void goToSignInPage() {
         Intent intent = new Intent(this, GoogleSignInActivity.class);
         startActivity(intent);
+
     }
 
     private void goToImages(String cameraID) {
         Intent intent = new Intent(this, ImageActivity.class);
         intent.putExtra("CAMERA_ID",cameraID);
         startActivity(intent);
+
     }
 
     private void goToNotifications(){
         Intent intent = new Intent(this,NotificationsActivity.class);
         startActivity(intent);
+
     }
     private void goToRegisterPage() {
         Intent intent = new Intent(this, RegisterActivity.class);
@@ -318,7 +372,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         unregisterReceiver(receiver);
-
+        notificationsRef.removeEventListener(snapshotListenerHandle); //TODO debug this; I never restablish it within onResume, so how is it working?
+        //beginListening = false; //when we come back to this activity; ignore the last notification once more
+        //makeToast("made false"); //TODO remove this
         disableButtons();
     }
 
@@ -410,6 +466,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+    }
 
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        notificationsRef.removeEventListener(snapshotListenerHandle);
     }
 }

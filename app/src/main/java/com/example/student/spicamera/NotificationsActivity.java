@@ -1,6 +1,5 @@
 package com.example.student.spicamera;
 
-import android.app.LauncherActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
@@ -10,16 +9,11 @@ import android.os.Build;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
-import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -73,6 +67,9 @@ public class NotificationsActivity extends AppCompatActivity {
     private ArrayList<String> arrayList = new ArrayList<>();            //in elements parallel to the arraylist of notifications(wish it was 2d array)
     private ArrayAdapter<String> adapter; //the adapter between the database and listView
 
+    private ArrayList<ValueEventListener> allValueEventListenerHandles;
+    private ChildEventListener childEventListenerHandle;
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -117,6 +114,7 @@ public class NotificationsActivity extends AppCompatActivity {
         userImagesRef = FirebaseStorage.getInstance().getReference(); //Get a storage reference to storage: child must be format user/camera/photo
                                                                         // unlike the database reference which uses multiple children
 
+        allValueEventListenerHandles = new ArrayList<ValueEventListener>();
         adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,arrayList){// in here I link the array list to the adapter
             @NonNull
             @Override                                                                                   //and also implement querying for "seen" field
@@ -125,7 +123,7 @@ public class NotificationsActivity extends AppCompatActivity {
 
                 final TextView tv = (TextView) view.findViewById(android.R.id.text1);
 
-                dbReference.child(notificationsKeyList.get(position)).addValueEventListener(new ValueEventListener() {
+                allValueEventListenerHandles.add(dbReference.child(notificationsKeyList.get(position)).addValueEventListener(new ValueEventListener() { //TODO: remove this ondestroy
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists() && dataSnapshot.child("mode").getValue(String.class).equals("auto")) {
@@ -143,7 +141,7 @@ public class NotificationsActivity extends AppCompatActivity {
                     public void onCancelled(DatabaseError databaseError) {
 
                     }
-                });
+                }));
 
                 return view;
             }
@@ -197,7 +195,7 @@ public class NotificationsActivity extends AppCompatActivity {
         });
 
         //The block below handles changes in the database, and manages the array list used for the list view
-        dbReference.addChildEventListener(new ChildEventListener() {
+        childEventListenerHandle = dbReference.addChildEventListener(new ChildEventListener() { //TODO: remove this ondestroy
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {//actions taken when discovering things in the database
                 if(dataSnapshot.child("mode").getValue(String.class).equals("auto")){
@@ -400,5 +398,15 @@ public class NotificationsActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         registerReceiver(receiver, intentFilter);
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        dbReference.removeEventListener(childEventListenerHandle);
+        int handleAmount = allValueEventListenerHandles.size();
+        for(int i = 0; i < handleAmount; i++ ){
+            dbReference.removeEventListener(allValueEventListenerHandles.get(i));
+        }
     }
 }
