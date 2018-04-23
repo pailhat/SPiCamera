@@ -143,52 +143,6 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        //listener used to see if manual snapshot was successfull;
-
-        beginListening = false; //this is for the purpose of ignoring the initial "last" notification read
-
-        notificationsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                //makeToast(String.valueOf(dataSnapshot.hasChild("-L9vIQnnXnRuiUWw1krA")));
-                beginListening = true;
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-        snapshotListenerHandle = notificationsRef.limitToLast(1).addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                if(beginListening && dataSnapshot.child("camera").getValue(String.class).equals(cameraID)&& dataSnapshot.child("mode").getValue(String.class).equals("manual")){
-                    makeToast("Snapshot taken!");
-                }
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
 
         //Change bell icon when notificaiton is received
         intentFilter = new IntentFilter();
@@ -466,6 +420,51 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+        //these three lines below are used to check if manual snapshots worked. First listener signals the second one to begin looking for new manual snapshots,
+        //by flipping the flag below. LOGIC:First listener flips the flag after the second listener has looked over all of the old notifications.
+        beginListening = false; //this is for the purpose of ignoring the initial "last" notification read //TODO debug these lines below
+
+        notificationsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                //makeToast(String.valueOf(dataSnapshot.hasChild("-L9vIQnnXnRuiUWw1krA")));
+                beginListening = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        snapshotListenerHandle = notificationsRef.limitToLast(1).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if(beginListening && dataSnapshot.child("camera").getValue(String.class).equals(cameraID)&& dataSnapshot.child("mode").getValue(String.class).equals("manual")){
+                    makeToast("Snapshot taken!");
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
